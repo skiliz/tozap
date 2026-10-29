@@ -38,7 +38,9 @@ Developer ID mode only:
 3. Commit to `main` and push.
 4. Run `ZAP_RELEASE_MODE=adhoc scripts/release.sh` (or, with a Developer ID,
    `ZAP_SIGN_IDENTITY="Developer ID Application: <legal name> (<TEAMID>)" ZAP_NOTARY_PROFILE=<profile> scripts/release.sh`).
-   The script:
+   To publish an artifact that was already built from the same source and tested on a clean account, add
+   `ZAP_RELEASE_DIST=<folder with ZAP-<version>.zip, .dmg and SHA256SUMS.txt>`: the script verifies it and uploads
+   those exact files instead of rebuilding (a rebuilt ZIP would have a different SHA-256). The script:
    1. refuses developer builds, a dirty tree, an existing tag or a missing dated changelog entry;
    2. builds arm64 and runs the tests;
    3. ad-hoc mode: checks the ad-hoc signature and packages; Developer ID mode: packages, notarizes, staples

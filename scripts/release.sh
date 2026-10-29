@@ -7,6 +7,9 @@
 #   ZAP_RELEASE_MODE=adhoc scripts/release.sh
 #       Ad-hoc signed, NOT notarized: users approve the app once in System Settings → Privacy & Security.
 #       The release notes and the cask say so. Nothing here strips quarantine or bypasses Gatekeeper.
+#   ZAP_RELEASE_DIST=<folder> (ad-hoc mode only)
+#       Publishes an already built and tested dist/ (ZIP, DMG, SHA256SUMS.txt) byte for byte instead of
+#       rebuilding, after checking its checksums, version, bundle identifier, signature and architecture.
 #
 # Both need the GitHub CLI logged in as a maintainer and a clean branch. See docs/RELEASING.md.
 set -euo pipefail
@@ -47,17 +50,35 @@ grep -q "## \[$VERSION\] - [0-9]" CHANGELOG.md || { echo "Add a dated CHANGELOG.
 [[ "$(grep -o "@[A-Z0-9]*@" "$TAP/templates/$TEMPLATE" | sort -u | tr '\n' ' ')" == "@SHA256@ @VERSION@ " ]] \
   || { echo "$TEMPLATE must contain exactly @VERSION@ and @SHA256@."; exit 1; }
 
-scripts/build.sh test
+NOTES=$(mktemp)
+if [[ -n "${ZAP_RELEASE_DIST:-}" ]]; then
+  [[ "$MODE" == adhoc ]] || { echo "ZAP_RELEASE_DIST is for ad-hoc releases."; exit 1; }
+  rm -rf dist && mkdir dist
+  cp "$ZAP_RELEASE_DIST/ZAP-$VERSION.zip" "$ZAP_RELEASE_DIST/ZAP-$VERSION.dmg" "$ZAP_RELEASE_DIST/SHA256SUMS.txt" dist/
+  (cd dist && shasum -a 256 -c SHA256SUMS.txt) || { echo "Checksums don't match."; exit 1; }
+  CHECK=$(mktemp -d)
+  ditto -x -k "dist/ZAP-$VERSION.zip" "$CHECK"
+  APP="$CHECK/ZAP Remote.app"
+  [[ "$(plutil -extract CFBundleShortVersionString raw "$APP/Contents/Info.plist")" == "$VERSION" ]] \
+    && [[ "$(plutil -extract CFBundleIdentifier raw "$APP/Contents/Info.plist")" == "local.zap.app" ]] \
+    && [[ "$(lipo -archs "$APP/Contents/MacOS/ZAP")" == "arm64" ]] \
+    || { echo "The prebuilt app doesn't match version $VERSION, local.zap.app and arm64."; exit 1; }
+  codesign --verify --strict --deep "$APP"
+  codesign -dv "$APP" 2>&1 | grep -q "Signature=adhoc" || { echo "Expected an ad-hoc signature."; exit 1; }
+  rm -rf "$CHECK"
+  scripts/build.sh test   # the tagged source still builds and passes its tests
+else
+  scripts/build.sh test
+fi
 APP="build/ZAP Remote.app"
 [[ "$(lipo -archs "$APP/Contents/MacOS/ZAP")" == "arm64" ]] || { echo "Expected an arm64-only build."; exit 1; }
 
-NOTES=$(mktemp)
 if [[ "$MODE" == developer-id ]]; then
   scripts/notarize.sh   # packages, notarizes, staples and checks Gatekeeper
 else
   codesign --verify --strict --deep "$APP"
   codesign -dv "$APP" 2>&1 | grep -q "Signature=adhoc" || { echo "Expected an ad-hoc signature."; exit 1; }
-  scripts/package.sh
+  [[ -n "${ZAP_RELEASE_DIST:-}" ]] || scripts/package.sh
   # Informational: Gatekeeper is expected to refuse an app that isn't notarized.
   spctl --assess --type execute "$APP" 2>/dev/null && echo "note: Gatekeeper accepted the app" \
     || echo "Gatekeeper refuses the app until the user approves it, as documented."
