@@ -20,6 +20,25 @@ and as observed on the verified device. Amazon does not document it and may chan
 All `:8080` and `:9090` requests carry `x-api-key` (a fixed public value of the protocol) and, after
 pairing, `x-client-token`. TLS: see [SECURITY.md](../SECURITY.md) — ZAP pins the Amazon root chain.
 
+## Previous / next (not available)
+
+There is no previous/next command (episode, track or channel) in this interface. Tested on 29 October 2026 on
+the verified Fire TV Stick (Fire OS 7.7.1.7), with the owner watching the TV:
+
+- **Negative control:** made-up actions (`/v1/FireTV?action=zap_bogus`, `/v1/media?action=zap_bogus`) are
+  refused with HTTP 400 "Bad arguments supplied", so the TV does validate action names.
+- **Refused the same way (400):** `/v1/media?action=` `next`, `previous`, `skip_next`, `skip_previous`,
+  `skipNext`, `skipPrevious`, `next_track`, `previous_track`; `/v1/FireTV?action=` `media_next`,
+  `media_previous`, `next`, `previous`, `channel_up`, `channel_down`, `media_next_track`,
+  `media_previous_track`, `skip_forward`, `skip_backward`; `scan` with `direction` `next`, `previous` or `skip`.
+- **Accepted (200):** `scan` with `direction` `forward` — a seek, not a skip.
+
+The other open-source implementations also have no such command; where they show "next", it sends `scan`.
+Android's real skip keys (`KEYCODE_MEDIA_NEXT` / `KEYCODE_MEDIA_PREVIOUS`) are reachable only through ADB
+debugging on the TV, which ZAP doesn't use. ZAP's side buttons therefore stay **Rewind** and
+**Fast-forward**, named for what they send. What `scan` does is up to the app in front: most seek, and in one
+IPTV app it changed channel.
+
 ## Now Playing (not available)
 
 The live investigation on a real device is in [NOW_PLAYING.md](NOW_PLAYING.md); in short:

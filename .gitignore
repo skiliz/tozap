@@ -1,5 +1,6 @@
 # build output and release artifacts (published as GitHub Release assets, never committed)
 /build/
+/build-dev/
 /dist/
 *.dmg
 *.zip

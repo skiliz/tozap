@@ -83,17 +83,28 @@ public final class FireTVClient: @unchecked Sendable {
     }
 
     public func media(_ command: MediaCommand) async throws {
+        let path = Self.mediaPath(command)
+        guard let direction = Self.scanDirection(command) else {
+            try await rest("POST", path)
+            return
+        }
+        try await rest("POST", path, json: ["direction": direction, "keyAction": ["keyActionType": "keyDown"]])
+        try? await Task.sleep(nanoseconds: 150_000_000)
+        try await rest("POST", path, json: ["direction": direction, "keyAction": ["keyActionType": "keyUp"]],
+                       wakeIfNeeded: false, retries: 3)
+    }
+
+    /// The only media requests the interface accepts: `play` toggles, `scan` seeks. It has no previous/next
+    /// (docs/PROTOCOL.md), so nothing is ever labelled as one.
+    public static func mediaPath(_ command: MediaCommand) -> String {
+        command == .playPause ? "/v1/media?action=play" : "/v1/media?action=scan"
+    }
+
+    public static func scanDirection(_ command: MediaCommand) -> String? {
         switch command {
-        case .playPause:
-            try await rest("POST", "/v1/media?action=play")
-        case .forward, .rewind:
-            let direction = command == .forward ? "forward" : "back"
-            try await rest("POST", "/v1/media?action=scan",
-                           json: ["direction": direction, "keyAction": ["keyActionType": "keyDown"]])
-            try? await Task.sleep(nanoseconds: 150_000_000)
-            try await rest("POST", "/v1/media?action=scan",
-                           json: ["direction": direction, "keyAction": ["keyActionType": "keyUp"]],
-                           wakeIfNeeded: false, retries: 3)
+        case .playPause: return nil
+        case .forward: return "forward"
+        case .rewind: return "back"
         }
     }
 
@@ -212,6 +223,22 @@ public final class FireTVClient: @unchecked Sendable {
             return try await session.data(for: request)
         } catch let error as URLError {
             throw FireTVError.network(error.localizedDescription)
+        }
+    }
+
+    /// Developer CLI only (`zapctl probe`): one request to a `/v1/` path with the paired credentials, for testing
+    /// undocumented actions while someone watches the TV. An HTTP answer, even 200, proves nothing by itself.
+    public func probe(_ method: String, _ path: String, json: [String: Any]? = nil) async -> (status: Int?, body: String) {
+        guard ["GET", "POST"].contains(method), path.hasPrefix("/v1/"), !path.contains("..") else {
+            return (nil, "refused: only GET/POST to /v1/ paths")
+        }
+        do {
+            let data = try await rest(method, path, json: json)
+            return (200, String(decoding: data.prefix(2_000), as: UTF8.self))
+        } catch FireTVError.http(let code, let body) {
+            return (code, String(body.prefix(2_000)))
+        } catch {
+            return (nil, error.localizedDescription)
         }
     }
 

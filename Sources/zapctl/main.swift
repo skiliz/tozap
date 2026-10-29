@@ -103,6 +103,13 @@ do {
         try await client().media(m)
         print(m.label)
 
+    case "probe":
+        // Undocumented-action testing, only with someone watching the TV: probe POST "/v1/media?action=next"
+        guard args.count >= 3 else { fail("probe <GET|POST> </v1/path> [json]") }
+        let json = args.count > 3 ? (try? JSONSerialization.jsonObject(with: Data(args[3].utf8))) as? [String: Any] : nil
+        let (status, body) = await client().probe(args[1], args[2], json: json)
+        print("\(args[1]) \(args[2]) → \(status.map(String.init) ?? "no HTTP answer") \(body)")
+
     case "launch":
         guard args.count == 2 else { fail("launch <appId>") }
         try await client().launch(appId: args[1])

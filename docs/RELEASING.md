@@ -1,64 +1,73 @@
 # Releasing ZAP
 
-Releases are built locally on an Apple silicon Mac; CI only builds and tests. A release is published only
-when it is signed with a Developer ID, notarized by Apple and accepted by Gatekeeper. The scripts enforce
-this and refuse anything else.
+Releases are built locally on an Apple silicon Mac; CI only builds and tests. `scripts/release.sh` has two modes:
+
+| Mode | Signature | Notarized | What users see |
+|---|---|---|---|
+| `ZAP_RELEASE_MODE=adhoc` (current) | Ad-hoc (`codesign -s -`) | No | macOS blocks the first launch; the user approves it once in System Settings → Privacy & Security → **Open Anyway**, and again after each update |
+| Developer ID (default mode of the script) | Developer ID Application, hardened runtime | Yes, stapled | Opens normally |
+
+ZAP is currently released in **ad-hoc mode**, because the project has no paid Apple Developer Program
+membership. Never describe an ad-hoc release as signed, notarized or "verified by Apple", never strip the
+quarantine attribute (in scripts, the cask or the docs), and never suggest turning off Gatekeeper.
 
 ## One-time prerequisites
 
-1. **Apple Developer Program membership** for the publisher. An organisation account needs a legal entity
-   with a D-U-N-S number, and its legal name appears in the certificate.
-2. A **Developer ID Application** certificate in the login keychain. `security find-identity -v -p codesigning`
-   should list it.
-3. A **notarytool keychain profile**, which stores the credentials in the keychain and never in this
-   repository:
-   ```sh
-   xcrun notarytool store-credentials <profile> --apple-id <apple-id> --team-id <TEAMID>
-   ```
-4. A **bundle identifier** on a domain the publisher controls, to replace `local.fireremote.app` in
-   `Resources/Info.plist` before the first signed build. The change resets the macOS permissions
-   (microphone, speech, local network) once. Preferences are stored under the bundle identifier, so they
-   need a one-time migration.
-5. The **GitHub CLI** (`gh`), logged in as a maintainer of `skiliz/zap`, and a clone of `skiliz/homebrew-tap`
-   next to this repository (or set `ZAP_TAP_DIR`).
+Both modes:
 
-Before the first signed release, also move the pairing token to the Keychain. A stable Developer ID
-signature makes that prompt-free.
+1. The **GitHub CLI** (`gh`), logged in as a maintainer of `skiliz/zap`, and a clone of `skiliz/homebrew-tap`
+   next to this repository (or set `ZAP_TAP_DIR`).
+2. A **bundle identifier** on a domain the publisher controls should replace `local.fireremote.app` in
+   `Resources/Info.plist` before the first public release, together with the preferences path in the cask's
+   `zap trash:`. The change resets the macOS permissions once, and preferences need a one-time migration.
+
+Developer ID mode only:
+
+3. **Apple Developer Program membership** for the publisher (an organisation needs a D-U-N-S number), and a
+   **Developer ID Application** certificate in the login keychain (`security find-identity -v -p codesigning`).
+4. A **notarytool keychain profile**, which keeps the credentials in the keychain and never in this repository:
+   `xcrun notarytool store-credentials <profile> --apple-id <apple-id> --team-id <TEAMID>`.
+5. Then move the pairing token to the Keychain: a stable signature makes that prompt-free.
 
 ## Steps
 
 1. Set `CFBundleShortVersionString` (and increment `CFBundleVersion`) in `Resources/Info.plist`.
-2. Add the version's section to `CHANGELOG.md`; it becomes the release notes. Replace "Unreleased" with the
-   date.
+2. Add the version's section to `CHANGELOG.md` with its date; it becomes the release notes.
 3. Commit to `main` and push.
-4. Run:
-   ```sh
-   ZAP_SIGN_IDENTITY="Developer ID Application: <legal name> (<TEAMID>)" \
-   ZAP_NOTARY_PROFILE=<profile> scripts/release.sh
-   ```
-   `scripts/release.sh` does the following:
-   1. Refuses developer builds.
-   2. Builds with the hardened runtime and `Resources/ZAP.entitlements`, and runs the tests.
-   3. Packages, notarizes and staples the app and the DMG with `scripts/notarize.sh`, then checks them with
-      `spctl`.
-   4. Writes `dist/SHA256SUMS.txt`.
-   5. Tags `v<version>` and creates a **draft** GitHub Release with the DMG, the ZIP and the checksums.
-   6. Writes `Casks/zap-remote.rb` in the tap from `templates/zap-remote.rb.in`, with the real version and the
-      ZIP's SHA-256.
-5. Check the draft release's assets and checksums on GitHub, then publish it.
-6. In the tap, run `brew style Casks/zap-remote.rb` and
-   `brew audit --cask --strict --online skiliz/tap/zap-remote`. Then commit and push.
-7. On a clean Mac or user account, test `brew install --cask skiliz/tap/zap-remote`:
-   - first launch with Gatekeeper on;
-   - pairing;
-   - `brew upgrade` keeps the pairing;
-   - `brew uninstall --cask zap-remote`, and `--zap` removes `~/Library/Application Support/ZAP Remote`.
+4. Run `ZAP_RELEASE_MODE=adhoc scripts/release.sh` (or, with a Developer ID,
+   `ZAP_SIGN_IDENTITY="Developer ID Application: <legal name> (<TEAMID>)" ZAP_NOTARY_PROFILE=<profile> scripts/release.sh`).
+   The script:
+   1. refuses developer builds, a dirty tree, an existing tag or a missing dated changelog entry;
+   2. builds arm64 and runs the tests;
+   3. ad-hoc mode: checks the ad-hoc signature and packages; Developer ID mode: packages, notarizes, staples
+      and checks Gatekeeper with `scripts/notarize.sh`;
+   4. writes `dist/SHA256SUMS.txt`;
+   5. tags `v<version>` and creates a **draft** GitHub Release with the DMG, the ZIP and the checksums. In
+      ad-hoc mode the notes start with the "not notarized, Open Anyway" notice;
+   6. writes `Casks/zap-remote.rb` in the tap from `templates/zap-remote-adhoc.rb.in` (with caveats) or
+      `templates/zap-remote.rb.in`, with the real version and the ZIP's SHA-256, and fails if a placeholder is
+      left.
+5. On a clean macOS user account, download the draft's ZIP in a browser (so it is quarantined) and check:
+   - the SHA-256 matches `SHA256SUMS.txt`;
+   - ad-hoc mode: the first launch is blocked, **Open Anyway** in System Settings → Privacy & Security works,
+     and nothing else is needed;
+   - pairing, the remote, voice permissions and Check for Updates.
+6. Publish the release on GitHub.
+7. In the tap: `brew audit --cask --strict --online skiliz/tap/zap-remote` (not `--new`, which requires
+   notarization), commit and push.
+8. Test Homebrew on a clean account:
+   - `brew install --cask skiliz/tap/zap-remote`: the same Gatekeeper approval appears, and the caveats explain it;
+   - `brew upgrade --cask skiliz/tap/zap-remote` keeps the pairing. In ad-hoc mode Homebrew warns that the signer
+     changed, macOS asks for approval again and may ask again for Microphone, Speech Recognition and Local
+     Network; check that the login item still works;
+   - `brew uninstall --cask zap-remote` keeps the data, and `--zap` removes `~/Library/Application Support/ZAP Remote`.
 
 Never commit signing certificates, passwords, API keys or tokens. Signing credentials come from the local
-keychain and environment only.
+keychain and environment only. Never attach third-party binaries (such as the mirroring receiver's APK) to a
+release.
 
 ## Developer builds
 
-`ZAP_DEVTOOLS=1 scripts/build.sh` adds an offline UI preview, a menu bar demo and the `zapremote://`
-automation interface (see CONTRIBUTING.md). `scripts/package.sh`, `scripts/release.sh` and CI refuse such
-builds.
+`ZAP_DEVTOOLS=1 scripts/build.sh` adds an offline UI preview, a menu bar demo, screenshot capture and the
+`zapremote://` automation interface (see CONTRIBUTING.md); `ZAP_BUILD_DIR=build-dev` keeps it apart from the
+normal build. `scripts/package.sh`, `scripts/release.sh` and CI refuse such builds.

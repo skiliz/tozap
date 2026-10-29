@@ -61,8 +61,23 @@ final class SettingsNavigation {
     var confirmingHideMenuBarIcon = false
     var showingShortcuts = false
     var diagnosticsCopied = false
-    var document: BundledDocument?
-    var showingLegalNotices = false
+
+    /// About → Check for Updates: one request to GitHub per click, never in the background.
+    private(set) var checkingForUpdates = false
+    private(set) var updateResult: UpdateCheckResult?
+    var showingUpdateResult = false
+
+    func checkForUpdates() {
+        guard !checkingForUpdates else { return }
+        checkingForUpdates = true
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+        Task {
+            let result = await UpdateChecker.check(installedVersion: version)
+            checkingForUpdates = false
+            updateResult = result
+            showingUpdateResult = true
+        }
+    }
 
     /// Bumped whenever the window becomes key, so permission and login-item states are re-read.
     private(set) var refreshTick = 0
@@ -76,26 +91,6 @@ final class SettingsNavigation {
         let all = SettingsSection.allCases
         guard let index = all.firstIndex(of: section) else { return }
         section = all[(index + offset + all.count) % all.count]
-    }
-}
-
-/// Text files shipped inside the app bundle (copied by scripts/build.sh).
-enum BundledDocument: String, Identifiable {
-    case license = "LICENSE"
-    case notices = "THIRD_PARTY_NOTICES.md"
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .license: return "MIT License"
-        case .notices: return "Acknowledgements"
-        }
-    }
-
-    var text: String? {
-        guard let url = Bundle.main.url(forResource: rawValue, withExtension: nil) else { return nil }
-        return try? String(contentsOf: url, encoding: .utf8)
     }
 }
 
@@ -511,33 +506,5 @@ struct SettingsBadge: View {
             .padding(.vertical, 2.5)
             .background(Capsule().fill(Color.white.opacity(0.08)))
             .overlay(Capsule().strokeBorder(Color.white.opacity(0.08)))
-    }
-}
-
-/// The text of a bundled document (license, acknowledgements) in a sheet.
-struct BundledDocumentSheet: View {
-    let document: BundledDocument
-    let navigation: SettingsNavigation
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(document.title).font(.system(size: 15, weight: .semibold)).accessibilityAddTraits(.isHeader)
-            ScrollView {
-                Text(document.text ?? "This file isn't included in this build. It is part of ZAP's source code.")
-                    .font(.system(size: 11.5, design: .monospaced))
-                    .foregroundStyle(DS.Palette.textSecondary)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-            }
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.black.opacity(0.25)))
-            HStack {
-                Spacer()
-                Button("Done") { navigation.document = nil }
-                    .keyboardShortcut(.defaultAction)
-            }
-        }
-        .padding(20)
-        .frame(width: 560, height: 460)
     }
 }

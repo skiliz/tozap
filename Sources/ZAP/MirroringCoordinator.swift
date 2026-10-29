@@ -16,6 +16,12 @@ final class MirroringCoordinator {
         /// AirPlay receivers the Mac can see (excluding the Mac's own receiver).
         case guide([String])
         case notFound
+
+        /// A receiver was just found, so Mirror opens Displays settings instead of the receiver.
+        var isReady: Bool {
+            if case .guide = self { return true }
+            return false
+        }
     }
 
     /// Free, open-source receiver (F-Droid / GitHub jqssun/android-airplay-server, v0.0.36). Verified on this
@@ -64,7 +70,9 @@ final class MirroringCoordinator {
             found = await visibleReceivers(seconds: 10, tvHost: tvHost)
         }
         let onTV = found.filter(\.onTV)
-        let shown = onTV.isEmpty ? found : onTV
+        // With a paired TV only its own receiver counts; another AirPlay device (an Apple TV, a speaker) is
+        // never presented as the TV's receiver.
+        let shown = tvHost == nil ? found : onTV
         stage = shown.isEmpty ? .notFound : .guide(shown.map(\.name))
         log.notice("mirroring: \(String(describing: self.stage), privacy: .private)")
         // Only the paired TV's own receiver is remembered (for the menu bar's mirroring light) — never the

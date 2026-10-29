@@ -2,16 +2,10 @@ import AppKit
 import SwiftUI
 import ZAPKit
 
-/// Public links shown in About. The repository isn't published yet, so no link is shown until it exists.
-enum AppLinks {
-    static let repository: URL? = nil
-}
-
 private func binding<Value>(_ get: @escaping () -> Value, _ set: @escaping (Value) -> Void) -> Binding<Value> {
     Binding(get: get, set: set)
 }
 
-/// Connection state with its dot; the label carries the meaning, the colour only repeats it.
 /// Connection state with its dot. Green only while the TV confirmed the connection recently (the same rule
 /// as the menu bar and the capsule); a hollow dot means not confirmed. The label always carries the meaning.
 struct ConnectionStatusLabel: View {
@@ -696,54 +690,89 @@ struct MirroringSettingsPage: View {
     let model: RemoteModel
 
     var body: some View {
-        SettingsPage(title: "Mirroring", subtitle: "Mirror or extend your Mac's screen on the TV with AirPlay.") {
+        SettingsPage(title: "Mirroring", subtitle: "Mirror your Mac to your Fire TV using a compatible AirPlay receiver.") {
             SettingsGroup {
-                VStack(alignment: .leading, spacing: 10) {
-                    Step(number: 1, text: "ZAP opens an AirPlay receiver app on your Fire TV and checks that this Mac can see it.")
-                    Step(number: 2, text: "You choose it in Control Center → Screen Mirroring, to mirror or extend your display.")
-                    Text("macOS doesn't let apps start mirroring by themselves, so that last click is yours.")
-                        .font(.system(size: 11.5))
-                        .foregroundStyle(DS.Palette.textTertiary)
-                        .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 12) {
+                    Role(symbol: "laptopcomputer", title: "Your Mac",
+                         text: "macOS sends your screen over AirPlay when you choose the TV in Control Center → Screen Mirroring.")
+                    Role(symbol: "tv", title: "Your Fire TV",
+                         text: "A receiver app shows it. ZAP is tested with \(MirroringCoordinator.freeReceiver.name), a free, open-source app you install on the TV yourself.")
+                    Role(symbol: "av.remote", title: "ZAP",
+                         text: "The Mirror button on the remote opens the receiver on the TV and checks that your Mac can see it. ZAP doesn't send, receive or process video.")
                 }
                 .padding(16)
             }
             .padding(.bottom, 6)
-            SettingsValueRow(title: "Receiver app",
-                             subtitle: "\(MirroringCoordinator.freeReceiver.name) — free and open source — is opened first. AirPlay receivers in your TV's app list, such as AirScreen, are used if it isn't installed.") {
-                EmptyView()
-            }
-            SettingsDivider()
-            SettingsValueRow(title: "Receiver", subtitle: "Checked when you start mirroring.") {
+            SettingsValueRow(title: "AirPlay receiver on the TV", subtitle: statusDetail,
+                             note: statusNote, noteIsWarning: isNotFound) {
                 Text(status)
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(statusColor)
                     .multilineTextAlignment(.trailing)
             }
+            .accessibilityElement(children: .combine)
+            .onChange(of: status) { _, status in
+                AccessibilityNotification.Announcement("Receiver: \(status)").post()
+            }
             SettingsDivider()
             HStack(spacing: 10) {
                 Button("Open Receiver on TV") { model.startMirroring(recheck: true) }
                     .disabled(!model.isPaired || RemoteModel.offlinePreview)
-                    .help("Opens the AirPlay receiver app on the TV (the same as Mirror on the remote)")
+                    .help("Opens \(MirroringCoordinator.freeReceiver.name) on the TV and checks that this Mac can see it (the same as Mirror on the remote)")
                 Button("Open Displays Settings…") { model.mirroring.openDisplaySettings() }
                     .help("System Settings → Displays lists AirPlay displays to mirror or extend to")
                 Spacer()
+                Button { NSWorkspace.shared.open(ZAPProject.mirroringGuide) } label: {
+                    Label("Setup Guide", systemImage: "arrow.up.right").labelStyle(.titleAndIcon)
+                }
+                    .buttonStyle(.link)
+                    .foregroundStyle(Color(nsColor: .linkColor))
+                    .accessibilityAddTraits(.isLink)
+                    .help("How to install \(MirroringCoordinator.freeReceiver.name) on the Fire TV (opens GitHub)")
             }
-            .padding(.top, 14)
-            Text("Protected video (DRM) appears black when mirrored. Resolution and sound are chosen by macOS.")
-                .font(.system(size: 11.5))
-                .foregroundStyle(DS.Palette.textTertiary)
-                .padding(.top, 12)
+            .padding(.vertical, 14)
+            SettingsDivider()
+            VStack(alignment: .leading, spacing: 6) {
+                Text("To stop, choose Stop Mirroring in Control Center → Screen Mirroring.")
+                Text("Some protected video may appear black when mirrored. Resolution and sound depend on macOS and the receiver app.")
+            }
+            .font(.system(size: 11.5))
+            .foregroundStyle(DS.Palette.textTertiary)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.top, 12)
         }
     }
 
+    private var isNotFound: Bool {
+        if case .notFound = model.mirroring.stage { return true }
+        return false
+    }
+
+    /// Only what was actually seen: the receiver is found over Bonjour while it runs. Whether the app is
+    /// installed can't be read (sideloaded apps are missing from the TV's app list).
     private var status: String {
         switch model.mirroring.stage {
-        case .idle: return "Not checked yet"
-        case .searching(let message): return message
-        case .guide(let names): return "Ready: \(names.joined(separator: ", "))"
+        case .idle: return "Not checked"
+        case .searching: return "Checking…"
+        case .guide(let names): return names.first ?? "Ready"
         case .notFound: return "Not found"
         }
+    }
+
+    private var statusDetail: String {
+        switch model.mirroring.stage {
+        case .idle:
+            return model.isPaired ? "Checked when you press Mirror on the remote or Open Receiver on TV."
+                                  : "Pair a Fire TV in Device first."
+        case .searching(let message): return message
+        case .guide: return "Ready. Choose it in Control Center → Screen Mirroring."
+        case .notFound: return "Your Mac can't see an AirPlay receiver on the TV."
+        }
+    }
+
+    private var statusNote: String? {
+        guard isNotFound else { return nil }
+        return "Install \(MirroringCoordinator.freeReceiver.name) on the TV (see the Setup Guide), check that the Mac and the TV are on the same network, then try again."
     }
 
     private var statusColor: Color {
@@ -754,17 +783,25 @@ struct MirroringSettingsPage: View {
         }
     }
 
-    private struct Step: View {
-        let number: Int
+    private struct Role: View {
+        let symbol: String
+        let title: String
         let text: String
 
         var body: some View {
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text("\(number)")
-                    .font(.system(size: 11, weight: .bold))
-                    .frame(width: 20, height: 20)
-                    .background(Circle().fill(Color.white.opacity(0.1)))
-                Text(text).font(.system(size: 12.5)).fixedSize(horizontal: false, vertical: true)
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Image(systemName: symbol)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(DS.Palette.textSecondary)
+                    .frame(width: 20)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).font(.system(size: 13, weight: .medium))
+                    Text(text)
+                        .font(.system(size: 12))
+                        .foregroundStyle(DS.Palette.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             .accessibilityElement(children: .combine)
         }
@@ -905,8 +942,8 @@ private struct KeyboardShortcutsDisclosure: View {
 
 // MARK: - About
 
-/// Identity first (icon, ZAP, tagline, version), a quiet signature, then a short list of actions. Legal
-/// notices are one level deeper, complete and readable in their own sheet.
+/// The product identity, centred: icon, name, version and signature, then two actions. Legal texts live in
+/// the repository and inside the app bundle (LICENSE, THIRD_PARTY_NOTICES.md), not on this page.
 struct AboutSettingsPage: View {
     let navigation: SettingsNavigation
 
@@ -918,25 +955,18 @@ struct AboutSettingsPage: View {
                     AboutIdentity(version: info?["CFBundleShortVersionString"] as? String ?? "—",
                                   build: info?["CFBundleVersion"] as? String)
                     AboutSignature()
-                        .padding(.top, 24)
+                        .padding(.top, 20)
                     AboutActions(navigation: navigation)
-                        .frame(maxWidth: 360)
-                        .padding(.top, 28)
-                    LegalNoticesLink(navigation: navigation)
-                        .padding(.top, 12)
+                        .frame(maxWidth: 340)
+                        .padding(.top, 26)
                 }
                 .padding(.horizontal, DS.Settings.contentPadding)
-                .padding(.vertical, 28)
+                .padding(.vertical, 24)
                 // Centred in the panel when there's room, scrolling when the window is short.
                 .frame(maxWidth: .infinity, minHeight: proxy.size.height)
             }
         }
-        .sheet(item: binding({ navigation.document }, { navigation.document = $0 })) { document in
-            BundledDocumentSheet(document: document, navigation: navigation)
-        }
-        .sheet(isPresented: binding({ navigation.showingLegalNotices }, { navigation.showingLegalNotices = $0 })) {
-            LegalNoticesSheet(navigation: navigation)
-        }
+        .modifier(UpdateResultAlert(navigation: navigation))
     }
 }
 
@@ -963,15 +993,12 @@ private struct AboutIdentity: View {
                 .padding(.top, 18)
                 .accessibilityLabel("ZAP")
                 .accessibilityAddTraits(.isHeader)
-            Text("Your TV. One click away.")
-                .font(.system(size: 15))
-                .foregroundStyle(DS.Palette.textPrimary.opacity(0.9))
-                .padding(.top, 6)
-            Text("Version \(version)" + (build.map { " (\($0))" } ?? ""))
+            Text("Version \(version)")
                 .font(.system(size: 12).monospacedDigit())
                 .foregroundStyle(DS.Palette.textTertiary)
                 .textSelection(.enabled)
-                .padding(.top, 8)
+                .help(build.map { "Build \($0)" } ?? "")
+                .padding(.top, 6)
         }
     }
 }
@@ -996,34 +1023,45 @@ private struct AboutActions: View {
     let navigation: SettingsNavigation
 
     var body: some View {
-        let repository = AppLinks.repository
         SettingsGroup {
             AboutActionRow(symbol: "chevron.left.forwardslash.chevron.right", title: "GitHub Repository",
-                           detail: repository == nil ? "Not published yet" : nil,
-                           accessory: repository == nil ? nil : "arrow.up.right",
-                           hint: repository == nil ? "The source code repository isn't published yet." : "Opens ZAP's source code on GitHub.") {
-                if let repository { NSWorkspace.shared.open(repository) }
-            }
-            .disabled(repository == nil)
-            SettingsDivider().padding(.leading, 46)
-            AboutActionRow(symbol: "doc.text", title: "License", detail: "MIT", accessory: "chevron.right",
-                           hint: "Shows the full MIT License text.") {
-                navigation.document = .license
+                           accessory: .symbol("arrow.up.right"),
+                           hint: "Opens ZAP's source code on GitHub in your browser.") {
+                NSWorkspace.shared.open(ZAPProject.repository)
             }
             SettingsDivider().padding(.leading, 46)
-            AboutActionRow(symbol: "text.book.closed", title: "Acknowledgements", detail: nil, accessory: "chevron.right",
-                           hint: "Credits and third-party notices.") {
-                navigation.document = .notices
+            AboutActionRow(symbol: "arrow.triangle.2.circlepath", title: "Check for Updates",
+                           accessory: updateAccessory,
+                           hint: RemoteModel.offlinePreview
+                               ? "Unavailable in the offline preview."
+                               : "Asks GitHub once for ZAP's latest release. Nothing is downloaded or installed.") {
+                navigation.checkForUpdates()
             }
+            .disabled(navigation.checkingForUpdates || RemoteModel.offlinePreview)
+            .accessibilityValue(navigation.checkingForUpdates ? "Checking" : "")
+        }
+    }
+
+    private var updateAccessory: AboutActionRow.Accessory? {
+        if navigation.checkingForUpdates { return .progress }
+        switch navigation.updateResult {
+        case .upToDate: return .text("Up to date")
+        case .updateAvailable(_, let latest, _): return .text("Version \(latest) available")
+        default: return nil
         }
     }
 }
 
 private struct AboutActionRow: View {
+    enum Accessory {
+        case symbol(String)
+        case text(String)
+        case progress
+    }
+
     let symbol: String
     let title: String
-    let detail: String?
-    let accessory: String?
+    let accessory: Accessory?
     let hint: String
     let action: () -> Void
 
@@ -1036,20 +1074,25 @@ private struct AboutActionRow: View {
                     .frame(width: 20)
                 Text(title).font(.system(size: 13))
                 Spacer(minLength: 8)
-                if let detail {
-                    Text(detail).font(.system(size: 12)).foregroundStyle(DS.Palette.textTertiary)
-                }
-                if let accessory {
-                    Image(systemName: accessory)
+                switch accessory {
+                case .symbol(let name):
+                    Image(systemName: name)
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(DS.Palette.textTertiary)
+                case .text(let text):
+                    Text(text).font(.system(size: 12)).foregroundStyle(DS.Palette.textTertiary)
+                case .progress:
+                    ProgressView().controlSize(.small).accessibilityHidden(true)
+                case nil:
+                    EmptyView()
                 }
             }
             .padding(.horizontal, 14)
-            .frame(minHeight: 40)
+            .frame(minHeight: 44)
             .contentShape(Rectangle())
         }
         .buttonStyle(AboutRowButtonStyle())
+        .help(hint)
         .accessibilityHint(hint)
     }
 }
@@ -1071,77 +1114,83 @@ private struct AboutRowButton<Label: View>: View {
             .background(Color.white.opacity(!isEnabled ? 0 : (pressed ? 0.09 : (hover.isHovering ? 0.045 : 0))))
             .opacity(isEnabled ? 1 : 0.5)
             .contentShape(Rectangle())
-            .contentShape(.focusEffect, Rectangle())
+            .contentShape(.focusEffect, RoundedRectangle(cornerRadius: 7, style: .continuous).inset(by: 4))
             .onHover { hover.isHovering = $0 }
     }
 }
 
-/// Discreet in the page, fully readable when opened.
-private struct LegalNoticesLink: View {
+/// The outcome of Check for Updates as a standard alert. Only a confirmed newer stable release offers a
+/// download, and only from its GitHub release page; Homebrew installs are pointed at `brew upgrade`.
+private struct UpdateResultAlert: ViewModifier {
     let navigation: SettingsNavigation
-    @StateObject private var hover = HoverState()
 
-    var body: some View {
-        Button { navigation.showingLegalNotices = true } label: {
-            HStack(spacing: 4) {
-                Text("Legal Notices")
-                Image(systemName: "chevron.right").font(.system(size: 8, weight: .semibold))
+    func body(content: Content) -> some View {
+        let result = navigation.updateResult
+        content.alert(result.map(UpdateMessage.title) ?? "",
+                      isPresented: binding({ navigation.showingUpdateResult }, { navigation.showingUpdateResult = $0 }),
+                      presenting: result) { result in
+            switch result {
+            case .updateAvailable(_, _, let page):
+                if UpdateMessage.installation == .homebrew {
+                    Button("Copy Command") {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(ZAPProject.homebrewUpgradeCommand, forType: .string)
+                    }
+                }
+                Button("View Release") { NSWorkspace.shared.open(page) }
+                Button("Later", role: .cancel) {}
+            case .networkUnavailable, .serverError:
+                Button("Try Again") { navigation.checkForUpdates() }
+                Button("OK", role: .cancel) {}
+            case .invalidResponse:
+                Button("Open Releases Page") { NSWorkspace.shared.open(ZAPProject.releasesPage) }
+                Button("OK", role: .cancel) {}
+            default:
+                Button("OK", role: .cancel) {}
             }
-            .font(.system(size: 11.5))
-            .foregroundStyle(hover.isHovering ? DS.Palette.textSecondary : DS.Palette.textTertiary)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
-            .contentShape(Rectangle())
+        } message: { result in
+            Text(UpdateMessage.message(result))
         }
-        .buttonStyle(.plain)
-        .onHover { hover.isHovering = $0 }
-        .help("Non-affiliation, trademarks, copyright and third-party notices")
-        .accessibilityLabel("Legal Notices")
-        .accessibilityHint("Non-affiliation, trademarks, copyright and third-party notices.")
     }
 }
 
-struct LegalNoticesSheet: View {
-    let navigation: SettingsNavigation
+enum UpdateMessage {
+    static var installation: InstallationSource { InstallationSource.detect(bundlePath: Bundle.main.bundlePath) }
 
-    var body: some View {
-        let sections = LegalNotices.sections(license: BundledDocument.license.text)
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Legal Notices")
-                .font(.system(size: 17, weight: .semibold))
-                .accessibilityAddTraits(.isHeader)
-                .padding(.bottom, 14)
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    ForEach(sections, id: \.title) { section in
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(section.title)
-                                .font(.system(size: 12.5, weight: .semibold))
-                                .accessibilityAddTraits(.isHeader)
-                            Text(section.body)
-                                .font(.system(size: 12))
-                                .lineSpacing(2)
-                                .foregroundStyle(DS.Palette.textSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .textSelection(.enabled)
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
-            }
-            .background(RoundedRectangle(cornerRadius: DS.Settings.groupRadius, style: .continuous).fill(DS.Settings.group))
-            .overlay(RoundedRectangle(cornerRadius: DS.Settings.groupRadius, style: .continuous)
-                .strokeBorder(DS.Settings.panelStroke))
-            HStack {
-                Spacer()
-                Button("Done") { navigation.showingLegalNotices = false }
-                    .keyboardShortcut(.defaultAction)
-            }
-            .padding(.top, 14)
+    static func title(_ result: UpdateCheckResult) -> String {
+        switch result {
+        case .upToDate: return "ZAP is up to date."
+        case .updateAvailable(_, let latest, _): return "ZAP \(latest) is available."
+        case .noPublicRelease: return "There's no public release yet."
+        case .rateLimited: return "ZAP can't check for updates right now."
+        default: return "ZAP couldn't check for updates."
         }
-        .padding(22)
-        .frame(width: 520, height: 480)
-        .onExitCommand { navigation.showingLegalNotices = false }
+    }
+
+    static func message(_ result: UpdateCheckResult) -> String {
+        switch result {
+        case .upToDate(let installed):
+            return "No newer version is available. You have ZAP \(installed)."
+        case .updateAvailable(let installed, _, _):
+            if installation == .homebrew {
+                return "You have version \(installed). ZAP was installed with Homebrew, so update it in Terminal:\n\n\(ZAPProject.homebrewUpgradeCommand)"
+            }
+            return "You have version \(installed). Download the new version from its release page on GitHub."
+        case .noPublicRelease:
+            return "ZAP hasn't published a stable release on GitHub yet."
+        case .networkUnavailable:
+            return "GitHub couldn't be reached. Check your internet connection and try again."
+        case .rateLimited(let retryAfter):
+            guard let retryAfter, retryAfter > Date() else {
+                return "GitHub is limiting requests from your network. Try again later."
+            }
+            return "GitHub is limiting requests from your network. Try again after \(retryAfter.formatted(date: .omitted, time: .shortened))."
+        case .invalidResponse:
+            return "ZAP couldn't read GitHub's response. You can check the releases page instead."
+        case .serverError(let code):
+            return "GitHub answered with an error (HTTP \(code)). Try again later."
+        case .unknownInstalledVersion:
+            return "This copy of ZAP has no readable version number."
+        }
     }
 }

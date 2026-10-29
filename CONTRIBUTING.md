@@ -34,7 +34,8 @@ the Command Line Tools don't ship SwiftUI's macro plugin; keep view state in the
 - One change per pull request, with a clear description and how you tested it.
 - Run `scripts/build.sh test` before submitting; CI runs the same.
 - Don't add third-party dependencies, telemetry or network calls to anything other than the user's TV (the
-  only exceptions are the documented, optional app-icon downloads and the user-chosen Alexa mode).
+  only exceptions are the documented, optional app-icon downloads, the user-chosen Alexa mode and the
+  user-initiated Check for Updates).
 - Never weaken TLS verification or pairing.
 - Only describe features as working if you verified them on a real device, and say which one.
 - Write documentation in clear, concise English.
@@ -48,6 +49,8 @@ By contributing you agree that your contribution is licensed under the MIT Licen
 - an offline UI preview that never contacts the TV or the network:
   `open -n "build/ZAP Remote.app" --args -ZAPOfflinePreview YES`, plus `-ZAPSettingsSection about` to open a
   Settings section and `-ZAPMenuBarDemo YES` to cycle the menu bar light through its states;
+- `-ZAPSettingsSection <section> -ZAPCaptureSettings <file.png>` opens a Settings section, captures ZAP's own
+  window (no Screen Recording permission needed) and quits; used for the README screenshots;
 - a `zapremote://` automation interface for testing (see `RemoteModel.handleURL`). It is enabled only by
   `defaults write local.fireremote.app automationURLs -bool true`; turn it off with
   `defaults delete local.fireremote.app automationURLs`.

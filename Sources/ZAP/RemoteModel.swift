@@ -686,7 +686,8 @@ final class RemoteModel {
     /// Receiver launches are part of the mirroring flow, which reports its own outcome.
     @ObservationIgnored private var silentLaunches: Set<String> = []
 
-    /// Prefers the free AirPlay Server, then any receiver app the TV lists (AirScreen, FireMirror).
+    /// Opens AirPlay Server on the TV (the receiver verified with ZAP) unless a receiver on the TV is already
+    /// visible, then reports what the Mac can see. Other receiver apps are used only when already running.
     /// While a receiver was just found, the Mirror button opens Displays settings instead; `recheck` (Settings)
     /// always opens and checks the receiver again.
     func startMirroring(recheck: Bool = false) {
@@ -699,7 +700,7 @@ final class RemoteModel {
             return
         }
         Task {
-            let receivers = [MirroringCoordinator.freeReceiver] + apps.airPlayReceivers
+            let receivers = [MirroringCoordinator.freeReceiver]
             silentLaunches = Set(receivers.map(\.appId))
             await mirroring.begin(receivers: receivers, tvHost: device?.host) { [weak self] app in
                 self?.send(.launch(appId: app.appId, name: app.name))

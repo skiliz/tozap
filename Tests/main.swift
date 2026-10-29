@@ -205,21 +205,7 @@ check(AirPlayDisplay.matches(screenName: "Android AirPlay", receiver: "android a
 check(!AirPlayDisplay.matches(screenName: "Built-in Retina Display", receiver: "Android AirPlay"), "built-in display never matches")
 check(!AirPlayDisplay.matches(screenName: "LG TV", receiver: "TV"), "too-short receiver names never match")
 
-// MARK: Legal notices stay complete and identical to the project's documents
-
-let licenseSample = "MIT License\n\nCopyright (c) 2026 Cosmos Agency — Cosmos Open Source\n\nPermission is hereby granted…"
-check(LegalNotices.copyrightLine(inLicense: licenseSample) == "Copyright (c) 2026 Cosmos Agency — Cosmos Open Source",
-      "the copyright line is read verbatim from LICENSE")
-let legal = LegalNotices.sections(license: licenseSample)
-check(legal.count == 4 && legal.map(\.title) == ["Independent App", "Trademarks", "Copyright and License", "Third-Party Content"],
-      "four legal sections in a stable order")
-check(legal[0].body.contains("not affiliated with, endorsed by, or sponsored by Amazon"), "non-affiliation stated in full")
-check(legal[1].body.contains("Amazon.com, Inc.") && legal[1].body.contains("other countries and regions")
-      && legal[1].body.contains("ZAP by Checkmarx") && legal[1].body.contains("not made or certified by Apple"),
-      "trademark owners, the AirPlay notice and the name notice are present")
-check(legal[2].body.hasPrefix("Copyright (c) 2026 Cosmos Agency") && legal[2].body.contains("MIT License"),
-      "copyright holder and license are shown")
-check(LegalNotices.sections(license: nil)[2].body.contains("MIT License"), "the license is named even without the file")
+// MARK: Legal notices stay in the public documents (About no longer shows them)
 
 /// Whitespace-collapsed text of a repository document (the runner starts in the repository root).
 func repositoryText(_ name: String) -> String? {
@@ -228,17 +214,125 @@ func repositoryText(_ name: String) -> String? {
         .split(whereSeparator: \.isWhitespace).joined(separator: " ")
 }
 if let readme = repositoryText("README.md") {
-    check(readme.contains(LegalNotices.independence) && readme.contains(LegalNotices.trademarks)
-          && readme.contains(LegalNotices.nameNotice) && readme.contains(LegalNotices.airPlayReceivers),
-          "About's legal text matches the README disclaimer")
+    for notice in [
+        "ZAP is an independent third-party application and is not affiliated with, endorsed by, or sponsored by Amazon.",
+        "Amazon, Fire TV, Fire OS and Alexa are trademarks of Amazon.com, Inc. or its affiliates.",
+        "Apple, AirPlay and macOS are trademarks of Apple Inc., registered in the U.S. and other countries and regions.",
+        "AirPlay receiver apps for Fire TV are third-party apps, not made or certified by Apple.",
+        "ZAP is unrelated to the ZAP web security scanner (ZAP by Checkmarx, formerly OWASP ZAP).",
+    ] {
+        check(readme.contains(notice), "README keeps the notice: \(notice.prefix(40))…")
+    }
+}
+if let license = repositoryText("LICENSE") {
+    check(license.hasPrefix("MIT License") && license.contains("Copyright (c) 2026 Cosmos Agency"),
+          "LICENSE keeps the MIT text and the copyright line")
 }
 if let notices = repositoryText("THIRD_PARTY_NOTICES.md")?.lowercased() {
-    check(notices.contains(LegalNotices.noThirdPartyCode.lowercased()) && notices.contains(LegalNotices.noAmazonCode.lowercased()),
-          "About's third-party text matches THIRD_PARTY_NOTICES.md")
+    check(notices.contains("zap contains no third-party code and has no package dependencies")
+          && notices.contains("no amazon software was decompiled and no amazon code, keys, firmware, apks or assets are included"),
+          "THIRD_PARTY_NOTICES.md keeps the code and Amazon statements")
     check(notices.contains("app icons shown on shortcut tiles are not part of zap")
           && notices.contains("they belong to their respective owners, and screenshots that show them do not imply any affiliation"),
-          "app icon ownership notice matches THIRD_PARTY_NOTICES.md")
+          "app icon ownership notice stays in THIRD_PARTY_NOTICES.md")
 }
+if FileManager.default.fileExists(atPath: "build/ZAP Remote.app") {
+    for file in ["LICENSE", "THIRD_PARTY_NOTICES.md"] {
+        check(FileManager.default.fileExists(atPath: "build/ZAP Remote.app/Contents/Resources/\(file)"),
+              "the app bundle ships \(file)")
+    }
+}
+
+// MARK: Media buttons say what they send (the Fire TV interface has no previous/next)
+
+check(MediaCommand.allCases == [.playPause, .forward, .rewind], "only Play/Pause, Fast-forward and Rewind exist")
+check(FireTVClient.mediaPath(.playPause) == "/v1/media?action=play" && FireTVClient.scanDirection(.playPause) == nil,
+      "Play/Pause is unchanged: the play toggle, no body")
+check(FireTVClient.mediaPath(.forward) == "/v1/media?action=scan" && FireTVClient.scanDirection(.forward) == "forward"
+      && FireTVClient.mediaPath(.rewind) == "/v1/media?action=scan" && FireTVClient.scanDirection(.rewind) == "back",
+      "Fast-forward and Rewind send scan, the interface's seek")
+check(MediaCommand.forward.label == "Fast-forward" && MediaCommand.rewind.label == "Rewind"
+      && MediaCommand.forward.symbol == "forward.fill" && MediaCommand.rewind.symbol == "backward.fill",
+      "seek buttons are never labelled or drawn as previous/next")
+check(MediaCommand.allCases.allSatisfy { !$0.label.lowercased().contains("next") && !$0.label.lowercased().contains("previous") },
+      "no media label claims previous/next")
+
+// MARK: Check for Updates
+
+func semver(_ text: String) -> SemanticVersion { SemanticVersion(text)! }
+check(semver("1.0.10") > semver("1.0.9"), "versions compare numerically, not as text")
+check(semver("v1.2") == semver("1.2.0") && semver("1") == semver("1.0.0"), "a leading v and missing parts are accepted")
+check(semver("1.0.0-beta.2") < semver("1.0.0") && semver("1.0.0-alpha") < semver("1.0.0-alpha.1")
+      && semver("1.0.0-alpha.1") < semver("1.0.0-beta") && semver("1.0.0-beta.2") < semver("1.0.0-beta.11")
+      && semver("1.0.0-1") < semver("1.0.0-alpha"),
+      "prereleases follow SemVer precedence")
+check(semver("1.0.0+5") == semver("1.0.0"), "build metadata is ignored")
+check(semver("2.0.0-rc.1").isPrerelease && !semver("2.0.0").isPrerelease, "prereleases are recognised")
+for bad in ["", "abc", "1.2.3.4", "1..2", "1.2.x", "1.0.0-", "1.0.0-be..ta", "１.0.0", "1.0.0-beta!"] {
+    check(SemanticVersion(bad) == nil, "invalid version rejected: \(bad)")
+}
+
+func release(_ tag: String, url: String = "https://github.com/skiliz/zap/releases/tag/v1.1.0",
+             prerelease: Bool = false, draft: Bool = false) -> Data {
+    let object: [String: Any] = ["tag_name": tag, "html_url": url, "prerelease": prerelease, "draft": draft]
+    return try! JSONSerialization.data(withJSONObject: object)
+}
+func evaluate(_ status: Int, _ body: Data = Data(), headers: [String: String] = [:],
+              installed: String = "1.0.0") -> UpdateCheckResult {
+    UpdateChecker.evaluate(statusCode: status, header: { headers[$0] }, body: body,
+                           installed: semver(installed), now: Date(timeIntervalSince1970: 1_000))
+}
+let releasePage = URL(string: "https://github.com/skiliz/zap/releases/tag/v1.1.0")!
+check(evaluate(200, release("v1.0.0")) == .upToDate(installed: semver("1.0.0")), "same version: up to date")
+check(evaluate(200, release("v1.0.0"), installed: "1.2.0") == .upToDate(installed: semver("1.2.0")),
+      "an installed build newer than the release is up to date")
+check(evaluate(200, release("v1.1.0")) == .updateAvailable(installed: semver("1.0.0"), latest: semver("1.1.0"), releasePage: releasePage),
+      "newer stable release: update available with its release page")
+check(evaluate(200, release("v1.0.10"), installed: "1.0.9") != .upToDate(installed: semver("1.0.9")),
+      "1.0.10 is newer than 1.0.9")
+check(evaluate(404) == .noPublicRelease, "no release (or no public repository): explained, not an error")
+check(evaluate(200, release("v1.1.0-beta.1")) == .noPublicRelease, "a prerelease tag is never offered to stable users")
+check(evaluate(200, release("v1.1.0", prerelease: true)) == .noPublicRelease, "a release flagged prerelease is never offered")
+check(evaluate(200, release("v1.1.0", draft: true)) == .noPublicRelease, "a draft is never offered")
+check(evaluate(200, release("v1.1.0", url: "https://evil.example/skiliz/zap/releases/tag/v1.1.0"))
+      == .updateAvailable(installed: semver("1.0.0"), latest: semver("1.1.0"), releasePage: ZAPProject.releasesPage),
+      "a release link off github.com is replaced by ZAP's release list")
+for link in ["http://github.com/skiliz/zap/releases/tag/v1", "https://github.com/other/zap/releases/tag/v1",
+             "https://github.com/skiliz/zap/releases/../../other", "https://user@github.com/skiliz/zap/releases/tag/v1",
+             "https://github.com:444/skiliz/zap/releases/tag/v1", "javascript:alert(1)"] {
+    check(UpdateChecker.releasePage(link) == ZAPProject.releasesPage, "unsafe release link refused: \(link)")
+}
+check(evaluate(403, headers: ["X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "5000"])
+      == .rateLimited(retryAfter: Date(timeIntervalSince1970: 5000)), "rate limit with its reset time")
+check(evaluate(429, headers: ["Retry-After": "60"]) == .rateLimited(retryAfter: Date(timeIntervalSince1970: 1060)),
+      "secondary rate limit with Retry-After")
+check(evaluate(429) == .rateLimited(retryAfter: nil), "429 without headers is still a rate limit")
+check(evaluate(403) == .serverError(403), "a plain 403 is not mistaken for a rate limit")
+check(evaluate(500) == .serverError(500) && evaluate(301) == .serverError(301), "other statuses are server errors")
+check(evaluate(200, Data("not json".utf8)) == .invalidResponse, "invalid JSON is never a success")
+check(evaluate(200, Data(#"{"html_url":"https://github.com/skiliz/zap/releases"}"#.utf8)) == .invalidResponse,
+      "a release without a tag is invalid")
+check(evaluate(200, release("latest")) == .invalidResponse, "a tag that isn't a version is invalid")
+check(evaluate(200, Data(count: UpdateChecker.maxResponseBytes + 1)) == .invalidResponse, "oversized answers are refused")
+check(ZAPProject.latestReleaseAPI.absoluteString == "https://api.github.com/repos/skiliz/zap/releases/latest"
+      && ZAPProject.repository.absoluteString == "https://github.com/skiliz/zap",
+      "the official repository and its latest-release endpoint")
+check(ZAPProject.homebrewUpgradeCommand == "brew upgrade --cask skiliz/tap/zap-remote", "the Homebrew upgrade command")
+let semaphore = DispatchSemaphore(value: 0)
+var unknownVersionResult: UpdateCheckResult?
+Task { unknownVersionResult = await UpdateChecker.check(installedVersion: "—"); semaphore.signal() }
+semaphore.wait()
+check(unknownVersionResult == .unknownInstalledVersion, "an unreadable installed version stops before any request")
+
+let caskroom: Set<String> = ["/opt/homebrew/Caskroom/zap-remote"]
+check(InstallationSource.detect(bundlePath: "/Applications/ZAP Remote.app", home: "/Users/u",
+                                fileExists: caskroom.contains) == .homebrew, "Homebrew cask in /Applications")
+check(InstallationSource.detect(bundlePath: "/Users/u/Applications/ZAP Remote.app", home: "/Users/u",
+                                fileExists: caskroom.contains) == .homebrew, "Homebrew cask in ~/Applications")
+check(InstallationSource.detect(bundlePath: "/Applications/ZAP Remote.app", home: "/Users/u",
+                                fileExists: { _ in false }) == .unknown, "no Caskroom entry: origin unknown")
+check(InstallationSource.detect(bundlePath: "/Users/u/Downloads/ZAP Remote.app", home: "/Users/u",
+                                fileExists: caskroom.contains) == .unknown, "a copy outside Applications isn't claimed by Homebrew")
 
 // MARK: App IDs from the TV are validated before any use
 

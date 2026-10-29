@@ -15,13 +15,14 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
   <img src="docs/screenshots/remote.png" alt="The ZAP remote, opened from the menu bar" width="320">
 </p>
 
-> **Status:** ZAP is available as source code. A signed and notarized download and the Homebrew cask will be
-> published with the first notarized release; they are not available yet.
+> **Status:** version 1.0.0 is being prepared. Until its release is published on GitHub, ZAP is available as
+> source code. Releases are free and open source, and **not signed with an Apple Developer ID or notarized by
+> Apple**: see [Install](#install).
 
 ## Features
 
 - **A remote in your menu bar:**
-  - Rewind, Play/Pause and Fast-forward;
+  - Rewind, Play/Pause and Fast-forward (what Rewind and Fast-forward do depends on the app on the TV);
   - a circular D-pad with OK, plus Back, Home and Menu;
   - hold a direction to scroll;
   - the keyboard works while the remote is open.
@@ -41,7 +42,8 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
     "Conferma"…).
   - Or speak to Alexa through your Fire TV.
 - **A Screen Mirroring helper:** ZAP opens the AirPlay receiver app on your TV and points you to macOS Screen
-  Mirroring.
+  Mirroring. macOS and the receiver do the streaming; ZAP never handles video.
+- **Check for Updates** in Settings → About, only when you click it.
 - **A native Settings window:** General, Device, Apps, Voice, Mirroring, Advanced and About.
 - **Local-first:** no account, no analytics, no telemetry, no server of ours.
 
@@ -49,11 +51,18 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
   <img src="docs/screenshots/settings-general.png" alt="ZAP Settings, General section" width="640">
 </p>
 
+<p align="center">
+  <img src="docs/screenshots/settings-mirroring.png" alt="ZAP Settings, Mirroring section" width="400">
+  <img src="docs/screenshots/settings-about.png" alt="ZAP Settings, About section" width="400">
+</p>
+
 ## What ZAP can't do
 
 - **Now Playing.** Fire TV doesn't tell remote apps the playing title, episode, artwork, progress or
   playback state, so ZAP never shows or guesses them. The investigation is in
   [docs/NOW_PLAYING.md](docs/NOW_PLAYING.md).
+- **Previous / next episode, track or channel.** Fire TV's remote interface has no such command (tested,
+  see [docs/PROTOCOL.md](docs/PROTOCOL.md)), so ZAP offers Rewind and Fast-forward instead of pretending.
 - **Volume and power.** They can't be controlled over the network on the verified device.
 - **Channel switching and TV guides.** Not supported.
 - **Mirroring on its own.** Screen Mirroring needs an AirPlay receiver app on the TV, and protected (DRM)
@@ -67,6 +76,36 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
 
 ## Install
 
+### Download
+
+When version 1.0.0 is published, download `ZAP-1.0.0.zip` (or the `.dmg`) from the
+[Releases](https://github.com/skiliz/zap/releases) page, check it against `SHA256SUMS.txt` if you like
+(`shasum -a 256 ZAP-1.0.0.zip`), and move **ZAP Remote** to Applications.
+
+### Homebrew
+
+```sh
+brew install --cask skiliz/tap/zap-remote
+```
+
+Available once the first release is published.
+
+### The first launch: approving an app that isn't notarized
+
+ZAP is distributed without a paid Apple Developer account, so it is **not signed with a Developer ID and not
+notarized by Apple** — Apple hasn't checked it. macOS therefore says it can't verify ZAP the first time you
+open it. If you downloaded it from this repository's releases or installed it with the Homebrew tap above:
+
+1. Open **ZAP Remote** from Applications, and click **Done** in the warning.
+2. Within about an hour, open **System Settings → Privacy & Security**, scroll to **Security**, click
+   **Open Anyway** next to the message about ZAP Remote, and enter your login password.
+3. Click **Open** to confirm.
+
+On macOS 14 Sonoma you can instead Control-click the app in Finder and choose **Open**. You never need to turn
+off Gatekeeper or change other security settings. Because each release is a new, unnotarized app to macOS,
+it asks again after every update, and may ask again for Microphone, Speech Recognition and Local Network
+access. If you'd rather not trust a prebuilt app, build it yourself:
+
 ### Build from source
 
 ```sh
@@ -77,19 +116,16 @@ open "build/ZAP Remote.app"
 ```
 
 You need Xcode or just the Command Line Tools (`xcode-select --install`); there are no other dependencies.
-Move `ZAP Remote.app` to Applications if you like.
+Move `ZAP Remote.app` to Applications if you like. An app you build yourself opens without the approval step.
 
-### Signed download and Homebrew (with the first notarized release)
+### Updates
 
-Once the first release signed with a Developer ID and notarized by Apple is published, you will be able to
-install it with:
+ZAP never checks for updates by itself. In **Settings → About**, click **Check for Updates**: ZAP asks GitHub
+once for the latest stable release and tells you whether a newer version exists. It never downloads or
+installs anything.
 
-```sh
-brew install --cask skiliz/tap/zap-remote
-```
-
-or by downloading the disk image from the [Releases](https://github.com/skiliz/zap/releases) page. ZAP is
-never distributed unsigned, and you won't need to change any macOS security setting.
+- Installed with Homebrew: `brew upgrade --cask skiliz/tap/zap-remote` (your pairing and settings are kept).
+- Downloaded: get the new version from its release page and replace the app in Applications.
 
 ## Getting started
 
@@ -108,7 +144,7 @@ never distributed unsigned, and you won't need to change any macOS security sett
 | Amber ring (blinks gently) | Reconnecting or looking for the TV |
 | Red dot, dimmed remote | The TV is unreachable or rejected the pairing |
 | Red microphone | ZAP is listening |
-| Blue dot at the bottom | Your screen is shown on the TV through AirPlay |
+| Blue dot at the bottom | Your Mac is using the TV as an AirPlay display (verified when extending the desktop) |
 
 The tooltip and VoiceOver describe the state in words.
 
@@ -134,9 +170,13 @@ Fire TV Sticks don't support AirPlay out of the box, so you need an **AirPlay re
 - Commercial receivers also exist.
 - AirPlay receiver apps for Fire TV are third-party apps, not made or certified by Apple.
 
-Click **Mirror** in ZAP: it opens the receiver on the TV and points you to **Control Center → Screen
-Mirroring**, where you choose to mirror or extend your display. macOS doesn't let apps start mirroring by
-themselves, so that last click is yours.
+Click **Mirror** in ZAP: it opens the receiver on the TV, checks that your Mac can see it, and points you to
+**Control Center → Screen Mirroring**, where you choose to mirror or extend your display. macOS doesn't let apps
+start mirroring by themselves, so that last click is yours. To stop, choose Stop Mirroring there.
+
+ZAP doesn't stream video: macOS sends the screen and the receiver app shows it. Mirroring keeps running if you
+quit ZAP. How to install the receiver, what it does on your network, and what was tested:
+[docs/MIRRORING.md](docs/MIRRORING.md).
 
 ## Privacy
 
@@ -144,7 +184,8 @@ ZAP talks to:
 
 - your Fire TV;
 - by default, Amazon's image servers for the icons of your TV's apps (Settings → Advanced to turn off);
-- in Alexa mode, Amazon's Alexa service.
+- in Alexa mode, Amazon's Alexa service;
+- GitHub, only when you click Check for Updates.
 
 There is no account, no analytics and no telemetry. The microphone is used only while you hold push-to-talk,
 and no audio is stored. Pairing data stays in `~/Library/Application Support/ZAP Remote`, readable only by
@@ -163,7 +204,10 @@ you. The full details are in [PRIVACY.md](PRIVACY.md), and security in [SECURITY
   that happens.
 - **Voice is off:** check Microphone (and, for Apple Speech, Speech Recognition) in System Settings →
   Privacy & Security.
-- **Mirroring finds no receiver:** install an AirPlay receiver app on the TV and open it once.
+- **Mirroring finds no receiver:** install AirPlay Server on the TV ([docs/MIRRORING.md](docs/MIRRORING.md))
+  and open it once. If it says "error starting server", another receiver app is using the AirPlay port.
+- **"Apple could not verify ZAP Remote…":** expected for a release that isn't notarized; approve it with
+  **Open Anyway** as described in [Install](#install).
 
 ## Uninstall
 
@@ -172,8 +216,8 @@ you. The full details are in [PRIVACY.md](PRIVACY.md), and security in [SECURITY
 3. To remove the pairing and settings too, delete `~/Library/Application Support/ZAP Remote` and
    `~/Library/Preferences/local.fireremote.app.plist`.
 
-Once it is available, `brew uninstall --cask zap-remote` removes the app and keeps your pairing; add `--zap`
-to remove ZAP's data as well.
+With Homebrew, `brew uninstall --cask zap-remote` removes the app and keeps your pairing; add `--zap` to remove
+ZAP's data as well.
 
 ## Building and contributing
 

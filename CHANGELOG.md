@@ -29,12 +29,17 @@ First public release.
   again after an address change, and reports when Local Network access is off.
 - **Voice:** push-to-talk with Italian commands recognised on the Mac (Apple Speech), or relayed to Alexa
   through the Fire TV. An optional global ⌃⌥V shortcut, with a warning if another app already uses it.
-- **Screen Mirroring helper:** opens an AirPlay receiver app on the TV and guides macOS Screen Mirroring.
+- **Screen Mirroring helper:** opens the AirPlay Server receiver app on the TV, checks that the Mac can see it,
+  and guides macOS Screen Mirroring. ZAP doesn't stream video; mirroring continues if ZAP quits.
+- **Check for Updates** in Settings → About: one request to GitHub's public API when clicked, never in the
+  background. It compares versions by Semantic Versioning, never offers prereleases, and points Homebrew
+  installs to `brew upgrade`.
 - **A Settings window** with General, Device, Apps, Voice, Mirroring, Advanced and About.
   - Launch at login uses macOS login items.
   - The menu bar icon can be hidden: open ZAP again to reach Settings.
   - Copy Summary copies a diagnostic summary with no personal data.
-  - Legal notices are available in About.
+  - About shows the app's identity, version, the GitHub repository and Check for Updates. The license and
+    third-party notices ship inside the app bundle and in the repository.
 
 ### Security and privacy
 - **TLS to the TV:** always verified against the Amazon root pinned at pairing. Pairing accepts only the
@@ -57,4 +62,9 @@ First public release.
 - Verified on one device: Fire TV Stick (3rd Gen) with Fire OS 7.7.1.7.
 - No Now Playing: Fire TV doesn't expose titles, artwork or playback state to remote apps
   ([docs/NOW_PLAYING.md](docs/NOW_PLAYING.md)).
-- No volume or power control. Screen Mirroring needs a third-party AirPlay receiver app on the TV.
+- No previous/next episode, track or channel: Fire TV's remote interface has no such command (tested), so the
+  side buttons are Rewind and Fast-forward, which send the interface's seek command.
+- No volume or power control. Screen Mirroring needs a third-party AirPlay receiver app sideloaded on the TV,
+  which isn't possible on Vega OS devices.
+- Not signed with an Apple Developer ID and not notarized: macOS asks you to approve the app once, and again
+  after each update.

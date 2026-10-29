@@ -21,20 +21,28 @@ bounty.
   serial number before sending any command. The new address is saved only after that check; a missing or
   different serial is refused.
 - **Credentials** are stored in `~/Library/Application Support/ZAP Remote/device.json`, written with mode
-  0600 from the start, in a folder kept at 0700. Moving the token to the Keychain is planned for the first
-  Developer ID-signed release (ad-hoc builds would make macOS ask for Keychain access after every update).
+  0600 from the start, in a folder kept at 0700. Any process running as your user can read it, as with other
+  per-user files. Moving the token to the Keychain is planned once releases carry a stable Developer ID
+  signature: with ad-hoc signed builds, macOS would ask for Keychain access again after every update.
 - **Data from the TV is validated.** App IDs must be package names before they are used anywhere; app icons
   are downloaded only from Amazon's image hosts, capped at 2 MB, and decoded only as PNG or JPEG
   thumbnails.
 - **Keyboard shortcuts** act only on keys typed into ZAP's open panel. The optional global push-to-talk
   shortcut uses the system hot-key API and needs no Accessibility or Input Monitoring permission.
 - **No listening sockets.** ZAP is a client only; it opens no ports.
+- **Update check on request only.** Check for Updates sends one HTTPS request to GitHub's public API when you
+  click it, follows redirects only within `api.github.com`, refuses answers over 1 MB, and opens a release page
+  only if it is on `github.com/skiliz/zap/releases`. It never downloads, installs or runs anything, and never
+  offers prereleases.
 
 ## Known limitations
 
-- **Release signing:** ZAP binaries are published only when they are signed with a Developer ID and
-  notarized by Apple ([docs/RELEASING.md](docs/RELEASING.md)). Until the first such release, build ZAP from
-  source.
+- **Release signing:** release 1.0 is ad-hoc signed, **not** signed with an Apple Developer ID and **not**
+  notarized by Apple. macOS can't confirm who built it, so you approve it once in System Settings → Privacy &
+  Security. Check the download against `SHA256SUMS.txt` in the release, or build from source
+  ([docs/RELEASING.md](docs/RELEASING.md)).
+- **The mirroring receiver is third-party software.** ZAP doesn't ship or install it. While it runs on the TV
+  it is an AirPlay server reachable by other devices on your network ([docs/MIRRORING.md](docs/MIRRORING.md)).
 - **The TV's voice socket** (port 9090) reportedly accepts connections without authentication (as
   documented by other open-source projects). That is a property of the Fire TV, not of ZAP: anyone on
   the same local network could send audio to its Alexa channel. Use ZAP on networks you trust.

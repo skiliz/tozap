@@ -811,7 +811,9 @@ private struct MirrorPill: View {
             PillLabel(symbol: "airplayvideo", title: "Mirror", subtitle: subtitle)
         }
         .buttonStyle(SurfaceButtonStyle(shape: Capsule()))
-        .help("Opens the AirPlay receiver on the TV, then choose it in Control Center → Screen Mirroring")
+        .help(model.mirroring.stage.isReady
+              ? "Opens System Settings → Displays, which lists AirPlay displays to mirror or extend to"
+              : "Opens the AirPlay receiver on the TV, then choose it in Control Center → Screen Mirroring")
         .accessibilityLabel("Mirror, \(subtitle)")
     }
 

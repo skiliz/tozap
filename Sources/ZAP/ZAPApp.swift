@@ -72,6 +72,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
                 SettingsWindowController.shared.show(prefs.showMenuBarIcon ? previewSection : .general)
             }
+#if ZAP_DEVTOOLS
+            // Screenshots: `-ZAPSettingsSection about -ZAPCaptureSettings <file.png>` opens that section (in the
+            // preview or with the paired TV), captures ZAP's own window, then quits.
+            if let path = UserDefaults.standard.string(forKey: "ZAPCaptureSettings"),
+               let section = UserDefaults.standard.string(forKey: "ZAPSettingsSection").flatMap(SettingsSection.init(rawValue:)) {
+                SettingsWindowController.shared.show(section)
+                Task {
+                    try? await Task.sleep(nanoseconds: 2_500_000_000)
+                    await PanelCapture.capture(to: URL(fileURLWithPath: path))
+                    NSApp.terminate(nil)
+                }
+            }
+#endif
         }
     }
 

@@ -32,7 +32,7 @@ public enum NavKey: String, CaseIterable, Codable, Sendable {
     }
 }
 
-public enum MediaCommand: String, Codable, Sendable {
+public enum MediaCommand: String, Codable, Sendable, CaseIterable {
     case playPause, forward, rewind
 
     public var label: String {

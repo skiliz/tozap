@@ -10,7 +10,7 @@ cd "${0:A:h}/.."
 
 SDK=$(xcrun --show-sdk-path)
 FLAGS=(-O -swift-version 5 -target arm64-apple-macos14.0 -sdk "$SDK")
-OUT=build
+OUT=${ZAP_BUILD_DIR:-build}  # developer builds can go elsewhere, e.g. ZAP_BUILD_DIR=build-dev
 OBJ=$OUT/obj
 APP="$OUT/ZAP Remote.app"
 mkdir -p $OBJ

@@ -42,9 +42,11 @@ pairing shown on their own TV.
 
 ZAP does not bundle or distribute any of these:
 
-- **AirPlay receiver apps for Fire TV**, needed only for Screen Mirroring — for example
-  [AirPlay Server](https://github.com/jqssun/android-airplay-server) (GPL-3.0, free) or AirScreen
-  (commercial). They are installed by the user, on the TV, under their own licences.
+- **AirPlay receiver apps for Fire TV**, needed only for Screen Mirroring. ZAP is tested with
+  [AirPlay Server](https://github.com/jqssun/android-airplay-server) by jqssun (GPL-3.0, free; package
+  `io.github.jqssun.airplay`), which ZAP can open on the TV by its package name. No part of it, or of UxPlay
+  on which it is built, is included in ZAP. Receivers are installed by the user, on the TV, from their
+  developers' channels and under their own licences.
 - **Alexa** (Amazon) processes voice when you choose the Alexa voice mode.
 
 ## Trademarks

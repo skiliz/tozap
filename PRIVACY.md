@@ -1,14 +1,15 @@
 # Privacy
 
 ZAP is local-first. It has no account, no Cosmos server, no analytics, no telemetry, no crash reporting and
-no update check. It opens no listening ports. ZAP talks to:
+no automatic update check. It opens no listening ports. ZAP talks to:
 
 - **your Fire TV**, on your local network;
 - **Amazon's image servers**, by default, for the icons of the apps on your TV (you can turn this off);
 - **Amazon's Alexa service**, through your Fire TV, only in Alexa voice mode and only while you hold
   push-to-talk;
 - **Apple's speech servers**, only if your Mac can't recognise Italian on-device *and* you turn on
-  *Allow Apple server recognition* (off by default).
+  *Allow Apple server recognition* (off by default);
+- **GitHub**, only when you click *Check for Updates* in Settings → About.
 
 ## What stays on your Mac
 
@@ -34,6 +35,19 @@ apps are on your TV. ZAP sends no cookies, keeps no HTTP cache and identifies it
 
 Turn the option off to keep ZAP's own traffic on your local network, apart from Alexa mode and optional
 Apple server recognition. Neutral symbols are shown instead, and **Remove** deletes the saved icons.
+
+## Check for Updates
+
+ZAP never checks for updates by itself. When you click **Settings → About → Check for Updates**, it sends one
+HTTPS request to GitHub's public API (`api.github.com/repos/skiliz/zap/releases/latest`) to read the latest
+release's version. The request carries no account, token, cookie or identifier other than the user agent
+`ZAP`, and nothing is cached. GitHub sees your IP address and the time, under GitHub's privacy statement.
+Nothing is downloaded or installed: if a newer version exists, ZAP shows it and opens the release page in your
+browser only if you ask. To check whether ZAP was installed with Homebrew, ZAP looks for Homebrew's
+`Caskroom/zap-remote` folder on your Mac; nothing about it is sent anywhere.
+
+**GitHub Repository** and **Setup Guide** (Settings → Mirroring) simply open pages on github.com in your
+browser.
 
 ## Microphone
 
@@ -82,7 +96,9 @@ It contains no names, addresses or tokens.
 ## Screen Mirroring
 
 ZAP does not capture or transmit your screen. macOS performs Screen Mirroring (Control Center), together with
-the AirPlay receiver app you install on the TV.
+the AirPlay receiver app you install on the TV. That receiver is third-party software with its own behaviour:
+while it runs, it is an AirPlay server visible to other devices on your network. See
+[docs/MIRRORING.md](docs/MIRRORING.md).
 
 ## Permissions
 
