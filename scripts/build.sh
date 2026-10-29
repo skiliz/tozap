@@ -43,7 +43,7 @@ if [[ -n "${ZAP_DEVTOOLS:-}" ]]; then  # the automation URL scheme exists only i
     -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes array" -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes:0 string zapremote" \
     "$APP/Contents/Info.plist"
 fi
-cp Resources/AppIcon.icns LICENSE THIRD_PARTY_NOTICES.md "$APP/Contents/Resources/"  # About → license, acknowledgements
+cp Resources/AppIcon.icns LICENSE THIRD_PARTY_NOTICES.md "$APP/Contents/Resources/"  # the license travels with the app
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 plutil -lint "$APP/Contents/Info.plist" >/dev/null
 

@@ -1,11 +1,12 @@
 # Releasing ZAP
 
-Releases are built locally on an Apple silicon Mac; CI only builds and tests. `scripts/release.sh` has two modes:
+Releases are built locally on an Apple silicon Mac; CI only builds and tests. Both modes sign with the hardened
+runtime. `scripts/release.sh` has two modes:
 
 | Mode | Signature | Notarized | What users see |
 |---|---|---|---|
 | `ZAP_RELEASE_MODE=adhoc` (current) | Ad-hoc (`codesign -s -`) | No | macOS blocks the first launch; the user approves it once in System Settings → Privacy & Security → **Open Anyway**, and again after each update |
-| Developer ID (default mode of the script) | Developer ID Application, hardened runtime | Yes, stapled | Opens normally |
+| Developer ID (default mode of the script) | Developer ID Application | Yes, stapled | Opens normally |
 
 ZAP is currently released in **ad-hoc mode**, because the project has no paid Apple Developer Program
 membership. Never describe an ad-hoc release as signed, notarized or "verified by Apple", never strip the
@@ -16,7 +17,7 @@ quarantine attribute (in scripts, the cask or the docs), and never suggest turni
 Both modes:
 
 1. The **GitHub CLI** (`gh`), logged in as a maintainer of `skiliz/zap`, and a clone of `skiliz/homebrew-tap`
-   next to this repository (or set `ZAP_TAP_DIR`).
+   next to this repository (or set `ZAP_TAP_DIR`). Run the release from a fresh clone of `skiliz/zap` on `main`.
 2. A **bundle identifier** on a domain the publisher controls should replace `local.fireremote.app` in
    `Resources/Info.plist` before the first public release, together with the preferences path in the cask's
    `zap trash:`. The change resets the macOS permissions once, and preferences need a one-time migration.

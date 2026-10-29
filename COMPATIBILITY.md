@@ -21,15 +21,16 @@ ZAP has two parts with different requirements:
 Only one device has been tested with ZAP. Everything else below is what public evidence suggests, not a
 promise.
 
-**Legend:** **Tested**: tested and confirmed with ZAP · **Documented**: supported by documented evidence,
-not tested with ZAP · **Unknown** · **Unsupported**
+**Legend:** **Tested**: tested and confirmed with ZAP · **Documented**: reported working by public sources,
+not tested with ZAP · **Expected**: inferred from the platform or the receiver's requirements, not tested ·
+**Unknown** · **Unsupported**
 
 | Device (model code, year) | Operating system | Remote control | Mirroring helper |
 |---|---|---|---|
 | Fire TV Stick 3rd Gen (AFTSSS, 2020) | Fire OS 7.7.1.7 | **Tested** | **Tested** with AirPlay Server 0.0.36 |
-| Fire TV Stick Lite (AFTSS, 2020), Stick 4K Max 1st Gen (AFTKA, 2021), Fire TV Cube 2nd/3rd Gen (AFTR, AFTGAZL), Fire OS 7 smart TVs | Fire OS 7 (Android 9) | Documented: same Fire OS 7 platform as the tested device | Documented: meets the receiver's Android version |
-| Fire TV Stick 4K 2nd Gen (AFTKM, 2023), Stick 4K Max 2nd Gen (AFTKRT, 2023), Fire OS 8 smart TVs | Fire OS 8 (Android 11) | Documented: other open-source projects report pairing and control on Fire OS 8 devices | Documented |
-| Fire TV Stick 4K 1st Gen (AFTMM, 2018), Fire TV Cube 1st Gen (AFTA), Fire TV 3rd Gen (AFTN), Fire OS 6 TVs | Fire OS 6 (Android 7.1) | Unknown: no project reports testing Fire OS 6 | Documented: meets the receiver's Android version |
+| Fire TV Stick Lite (AFTSS, 2020), Stick 4K Max 1st Gen (AFTKA, 2021), Fire TV Cube 2nd/3rd Gen (AFTR, AFTGAZL), Fire OS 7 smart TVs | Fire OS 7 (Android 9) | Expected: same Fire OS 7 platform as the tested device | Expected: meets the receiver's Android version |
+| Fire TV Stick 4K 2nd Gen (AFTKM, 2023), Stick 4K Max 2nd Gen (AFTKRT, 2023), Fire OS 8 smart TVs | Fire OS 8 (Android 11) | Documented: [mase1981/uc-intg-firetv](https://github.com/mase1981/uc-intg-firetv) (Fire TV Stick 4K Max 2nd Gen) and [LibreControl/fire-tv](https://github.com/LibreControl/fire-tv) report pairing and control on Fire OS 8 | Expected: meets the receiver's Android version |
+| Fire TV Stick 4K 1st Gen (AFTMM, 2018), Fire TV Cube 1st Gen (AFTA), Fire TV 3rd Gen (AFTN), Fire OS 6 TVs | Fire OS 6 (Android 7.1) | Unknown: no project reports testing Fire OS 6 | Expected: meets the receiver's Android version |
 | Fire TV Stick 1st/2nd Gen, Fire TV 1st/2nd Gen | Fire OS 5 (Android 5.1) | Unknown | **Unsupported**: older than the receiver supports |
 | Fire TV devices with Fire OS based on Android 14 (2026 smart TVs) | Fire OS (Android 14) | Unknown | Unknown |
 | Vega OS devices, e.g. Fire TV Stick 4K Select (AFTCA002, 2025) | Vega OS (Linux-based) | Unknown: no public evidence either way | **Unsupported**: Vega OS installs apps only from the Appstore, not Android APKs |

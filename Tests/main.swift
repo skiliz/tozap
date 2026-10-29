@@ -213,6 +213,8 @@ func repositoryText(_ name: String) -> String? {
     return String(decoding: data, as: UTF8.self).replacingOccurrences(of: "**", with: "")
         .split(whereSeparator: \.isWhitespace).joined(separator: " ")
 }
+check(repositoryText("README.md") != nil && repositoryText("LICENSE") != nil && repositoryText("THIRD_PARTY_NOTICES.md") != nil,
+      "README, LICENSE and THIRD_PARTY_NOTICES.md exist (missing files fail instead of skipping)")
 if let readme = repositoryText("README.md") {
     for notice in [
         "ZAP is an independent third-party application and is not affiliated with, endorsed by, or sponsored by Amazon.",

@@ -16,11 +16,11 @@ First public release.
 - **The status capsule:** at the top of the remote it shows the TV's name and its connection, which is green
   only when recently confirmed. It briefly confirms what just happened: an app opened, a reconnection, an
   AirPlay receiver being set up or ready, the microphone starting or recognising, or what you said. It also
-  shows when your screen is mirrored to the TV.
+  shows when macOS uses the TV as a display (verified when extending the desktop).
 - **The menu bar icon:** a slim remote with a status light.
   - Green when the TV confirmed the connection in the last 10 minutes.
   - An amber ring while reconnecting, and a red dot with the remote dimmed when unreachable.
-  - Gray when not checked; red while the microphone records; blue while the screen is shown on the TV.
+  - Gray when not checked; red while the microphone records; blue while macOS uses the TV as a display.
   - A brief pulse when the TV accepts a command.
   - A tooltip and VoiceOver describe the state.
 - **App shortcuts:** up to four, chosen from the apps installed on your TV. Reorder them by drag and drop or

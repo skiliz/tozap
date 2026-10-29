@@ -70,7 +70,7 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
 
 ## Requirements
 
-- macOS 14 Sonoma or later on an Apple silicon Mac.
+- macOS 14 Sonoma or later on an Apple silicon Mac (tested on macOS 27).
 - A Fire TV on the same local network as your Mac. Verified on a Fire TV Stick (3rd Gen) with Fire OS 7.7.1.7.
   Other models are untested: see [COMPATIBILITY.md](COMPATIBILITY.md).
 

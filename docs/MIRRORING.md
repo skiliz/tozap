@@ -35,7 +35,7 @@ screen. macOS doesn't let apps start Screen Mirroring by themselves, so choosing
 | Android package | `io.github.jqssun.airplay` |
 | Developer | jqssun — [github.com/jqssun/android-airplay-server](https://github.com/jqssun/android-airplay-server) |
 | License | GPL-3.0 (built on UxPlay, also GPL-3.0) |
-| Distribution | F-Droid ([f-droid.org/packages/io.github.jqssun.airplay](https://f-droid.org/packages/io.github.jqssun.airplay/)), GitHub Releases and Google Play. **Not** in the Amazon Appstore |
+| Distribution | F-Droid ([f-droid.org/packages/io.github.jqssun.airplay](https://f-droid.org/packages/io.github.jqssun.airplay/)), GitHub Releases and, according to its README, Google Play. **Not** in the Amazon Appstore |
 | Version tested | 0.0.36 on a Fire TV Stick (3rd Gen), Fire OS 7.7.1.7. The APK we installed was byte-identical (same SHA-256) to the developer's GitHub release |
 | Requirements | Android 7.0 or later according to its README (Fire OS 6, 7 and 8 meet this); 32-bit and 64-bit ARM builds |
 | Ads and tracking | F-Droid lists no anti-features, and its build file declares no advertising or analytics libraries |
@@ -75,8 +75,8 @@ Downloader. The steps above use the same file from F-Droid directly; that exact 
 ## Things to know about the receiver
 
 - **It is a server on your network.** While it runs, other devices on the same network can see it and try to
-  connect. AirPlay Server offers optional PIN authentication; no PIN was asked in our test.
-- **Permissions.** It asks to start at boot, to draw over other apps and to run in the foreground. That's
+  connect. AirPlay Server's README lists optional PIN authentication; no PIN was asked in our test.
+- **Permissions.** According to its F-Droid listing, it asks to start at boot, to draw over other apps and to run in the foreground. That's
   normal for a receiver, but worth knowing.
 - **Updates.** Sideloaded apps aren't updated by the Appstore. Check F-Droid or GitHub for new versions.
 - **One receiver at a time.** If AirPlay Server says "error starting server", another receiver app (for
