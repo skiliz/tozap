@@ -100,7 +100,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     let navigation = SettingsNavigation()
     private var window: NSWindow?
 
-    static let defaultSize = NSSize(width: 820, height: 580)
+    static let defaultSize = NSSize(width: 820, height: 660)  // every section fits without scrolling
     static let minimumSize = NSSize(width: 660, height: 440)
 
     func show(_ section: SettingsSection? = nil) {
@@ -141,6 +141,14 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         if !window.setFrameUsingName(PreferencesMigration.settingsWindowAutosaveName) { window.center() }
         return window
     }
+
+#if ZAP_DEVTOOLS
+    /// Screenshots and layout checks: a known content size instead of the remembered one.
+    func setContentSizeForCapture(_ size: NSSize) {
+        window?.setFrameAutosaveName("")  // never overwrite the remembered window position
+        window?.setContentSize(size)
+    }
+#endif
 
     /// Keeps the window inside the visible area of its screen (small MacBooks, scaled resolutions, Dock).
     private func fitOnScreen(_ window: NSWindow) {

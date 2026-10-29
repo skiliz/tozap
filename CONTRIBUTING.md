@@ -50,7 +50,8 @@ By contributing you agree that your contribution is licensed under the MIT Licen
   `open -n "build/ZAP Remote.app" --args -ZAPOfflinePreview YES`, plus `-ZAPSettingsSection about` to open a
   Settings section and `-ZAPMenuBarDemo YES` to cycle the menu bar light through its states;
 - `-ZAPSettingsSection <section> -ZAPCaptureSettings <file.png>` opens a Settings section, captures ZAP's own
-  window (no Screen Recording permission needed) and quits; used for the README screenshots;
+  window (no Screen Recording permission needed) and quits; used for the README screenshots. Add
+  `-ZAPCaptureSize 820x660` (the default window size) for a known size; the remembered window position is left alone;
 - a `zapremote://` automation interface for testing (see `RemoteModel.handleURL`). It is enabled only by
   `defaults write local.zap.app automationURLs -bool true`; turn it off with
   `defaults delete local.zap.app automationURLs`.

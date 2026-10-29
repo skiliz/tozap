@@ -82,6 +82,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     return
                 }
                 SettingsWindowController.shared.show(section)
+                // `-ZAPCaptureSize 820x580` captures at that content size (default: the window's own size).
+                if let size = UserDefaults.standard.string(forKey: "ZAPCaptureSize")?.split(separator: "x").compactMap({ Double($0) }),
+                   size.count == 2 {
+                    SettingsWindowController.shared.setContentSizeForCapture(NSSize(width: size[0], height: size[1]))
+                }
                 Task {
                     try? await Task.sleep(nanoseconds: 2_500_000_000)
                     await PanelCapture.capture(to: URL(fileURLWithPath: path))
