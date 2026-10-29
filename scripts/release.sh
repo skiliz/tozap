@@ -75,9 +75,10 @@ if [[ -n "${ZAP_RELEASE_DIST:-}" ]]; then
   hdiutil detach -quiet "$MOUNT"
   [[ "$SAME" == yes ]] || { echo "The DMG's app differs from the ZIP's."; exit 1; }
   scripts/build.sh test   # the tagged source still builds and passes its tests
-  # The build is reproducible: the tagged source must produce the very binary being published.
-  cmp -s "build/ZAP Remote.app/Contents/MacOS/ZAP" "$APP/Contents/MacOS/ZAP" \
-    || { echo "The tagged source doesn't rebuild the published binary."; exit 1; }
+  # The build is reproducible: the tagged source must produce the very bundle being published (binary,
+  # signature, LICENSE and notices).
+  diff -rq "build/ZAP Remote.app" "$APP" >/dev/null \
+    || { echo "The tagged source doesn't rebuild the published app bundle."; exit 1; }
   rm -rf "$CHECK"
 else
   scripts/build.sh test
