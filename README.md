@@ -15,9 +15,8 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
   <img src="docs/screenshots/remote.png" alt="The to.zap remote, opened from the menu bar" width="320">
 </p>
 
-> **Status:** version 1.0.0 is being prepared. Until its release is published on GitHub, to.zap is available as
-> source code. Releases are free and open source, and **not signed with an Apple Developer ID or notarized by
-> Apple**: see [Install](#install).
+> **Status:** version 1.0.0 is available. Releases are free and open source, and **not signed with an Apple
+> Developer ID or notarized by Apple**: see [Install](#install).
 
 ## Features
 
@@ -77,17 +76,15 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
 
 ### Download
 
-When version 1.0.0 is published, download `tozap-1.0.0.zip` (or the `.dmg`) from the
-[Releases](https://github.com/skiliz/tozap/releases) page, check it against `SHA256SUMS.txt` if you like
-(`shasum -a 256 tozap-1.0.0.zip`), and move **to.zap** to Applications.
+Download `tozap-1.0.0.zip` (or the `.dmg`) from the [Releases](https://github.com/skiliz/tozap/releases) page,
+check it against `SHA256SUMS.txt` if you like (`shasum -a 256 tozap-1.0.0.zip`), and move **to.zap** to
+Applications.
 
 ### Homebrew
 
 ```sh
 brew install --cask skiliz/tap/tozap-remote
 ```
-
-Available once the first release is published.
 
 ### The first launch: approving an app that isn't notarized
 
