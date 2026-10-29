@@ -55,12 +55,12 @@ final class MirroringCoordinator {
     /// visible. `tvHost` (the paired TV's address) tells the TV's receiver from others on the network.
     func begin(receivers: [FireTVApp], tvHost: String?, launch: (FireTVApp) -> Void) async {
         expiry?.cancel()
-        stage = .searching("Looking for an AirPlay receiver…")
+        stage = .searching("Looking for a receiver…")
         var found = await visibleReceivers(seconds: 2, tvHost: tvHost)
         let needsLaunch = tvHost == nil ? found.isEmpty : !found.contains(where: \.onTV)
         if needsLaunch, let receiver = receivers.first {
             launch(receiver)
-            stage = .searching("Opening \(receiver.name) on the TV…")
+            stage = .searching("Opening \(receiver.name)…")
             found = await visibleReceivers(seconds: 10, tvHost: tvHost)
         }
         let onTV = found.filter(\.onTV)

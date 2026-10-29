@@ -137,8 +137,8 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         host.sizingOptions = []  // the window, not the SwiftUI content, decides the size
         window.contentView = host
         window.setContentSize(Self.defaultSize)
-        window.setFrameAutosaveName("ZAPSettingsWindow")
-        if !window.setFrameUsingName("ZAPSettingsWindow") { window.center() }
+        window.setFrameAutosaveName(PreferencesMigration.settingsWindowAutosaveName)
+        if !window.setFrameUsingName(PreferencesMigration.settingsWindowAutosaveName) { window.center() }
         return window
     }
 

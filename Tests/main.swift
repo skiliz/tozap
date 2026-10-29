@@ -271,6 +271,21 @@ check(PreferencesMigration.migrate(from: legacyDefaults, to: targetDefaults, key
       && legacyRemoved, "the migration runs once")
 check(PreferencesMigration.migrate(from: MemoryStore(), to: MemoryStore(), keys: ["quickActions"]) {} == [],
       "a new user has nothing to migrate")
+/// A store whose writes don't stick, to prove the legacy copy is kept when verification fails.
+final class LossyStore: PreferenceStore {
+    var written: Set<String> = []
+    func object(forKey key: String) -> Any? { written.contains(key) ? ["changed"] : nil }
+    func set(_ value: Any?, forKey key: String) { written.insert(key) }
+    func bool(forKey key: String) -> Bool { false }
+}
+var removedDespiteLoss = false
+check(PreferencesMigration.migrate(from: legacyDefaults, to: LossyStore(), keys: ["quickActions"]) { removedDespiteLoss = true } == nil
+      && !removedDespiteLoss, "if a copied value doesn't read back identical, the old domain is kept")
+check(PreferencesMigration.migratedKeys.contains("NSWindow Frame \(PreferencesMigration.settingsWindowAutosaveName)"),
+      "the window position is migrated under AppKit's real autosave key")
+check(!PreferencesMigration.migratedKeys.contains("automationURLs") && PreferencesMigration.migratedKeys.contains("quickActions")
+      && PreferencesMigration.migratedKeys.contains("airPlayReceiverNames"),
+      "the real key list moves the settings and never the developer automation switch")
 
 // MARK: Media buttons say what they send (the Fire TV interface has no previous/next)
 
@@ -410,4 +425,5 @@ check(FileManager.default.fileExists(atPath: scannerFolder.appendingPathComponen
 try? FileManager.default.removeItem(at: moveRoot)
 
 print("\(passed) passed, \(failures) failed")
+try? FileManager.default.removeItem(at: temp)  // `exit` skips the top-level defer
 exit(failures == 0 ? 0 : 1)

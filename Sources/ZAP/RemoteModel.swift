@@ -708,7 +708,7 @@ final class RemoteModel {
             case .guide(let targets):
                 flash(.receiverReady(targets.first ?? "AirPlay receiver"), for: 5)
             case .notFound:
-                say("No AirPlay receiver on the TV", for: 5)
+                say("No AirPlay receiver on TV", for: 5)
             default:
                 break
             }

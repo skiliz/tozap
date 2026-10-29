@@ -75,8 +75,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #if ZAP_DEVTOOLS
             // Screenshots: `-ZAPSettingsSection about -ZAPCaptureSettings <file.png>` opens that section (in the
             // preview or with the paired TV), captures ZAP's own window, then quits.
-            if let path = UserDefaults.standard.string(forKey: "ZAPCaptureSettings"),
-               let section = UserDefaults.standard.string(forKey: "ZAPSettingsSection").flatMap(SettingsSection.init(rawValue:)) {
+            if let path = UserDefaults.standard.string(forKey: "ZAPCaptureSettings") {
+                guard let section = UserDefaults.standard.string(forKey: "ZAPSettingsSection").flatMap(SettingsSection.init(rawValue:)) else {
+                    print("-ZAPCaptureSettings needs -ZAPSettingsSection with one of: \(SettingsSection.allCases.map(\.rawValue))")
+                    NSApp.terminate(nil)
+                    return
+                }
                 SettingsWindowController.shared.show(section)
                 Task {
                     try? await Task.sleep(nanoseconds: 2_500_000_000)

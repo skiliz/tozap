@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- Kept from the pre-1.0 "Fire Remote" builds so existing permissions and settings carry over. -->
+	<!-- Never change: macOS keys permissions, preferences and the login item to it (pre-release builds used local.fireremote.app). -->
 	<key>CFBundleIdentifier</key>
 	<string>local.zap.app</string>
 	<key>CFBundleName</key>

@@ -20,8 +20,8 @@ Both modes:
    next to this repository (or set `ZAP_TAP_DIR`). Run the release from a fresh clone of `skiliz/zap` on `main`.
 2. The bundle identifier is **`local.zap.app`** (`Resources/Info.plist`, the logging subsystem, the
    preferences path in the cask's `zap trash:`). Never change it again: macOS keys permissions, preferences and
-   the login item to it. Pre-release builds used `local.fireremote.app`; their settings move across once
-   (`PreferencesMigration`).
+   the login item to it. Pre-release builds used `local.fireremote.app`; their settings and the Settings window
+   position move across once (`PreferencesMigration`), and any other legacy keys are dropped.
 
 Developer ID mode only:
 

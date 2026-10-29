@@ -820,7 +820,7 @@ private struct MirrorPill: View {
         case .guide:
             return "Opens System Settings → Displays, which lists AirPlay displays to mirror or extend to"
         case .notFound:
-            return "No AirPlay receiver found on the TV. Install and open an AirPlay receiver app (ZAP is tested with AirPlay Server), then try again"
+            return "No AirPlay receiver found on the TV. Install AirPlay Server on the TV, keep the Mac on the same network, then press Mirror again"
         default:
             return "Opens the AirPlay receiver on the TV, then choose it in Control Center → Screen Mirroring"
         }

@@ -14,18 +14,14 @@ enum AppDefaults {
     static let isOfflinePreview = false
 #endif
 
-    static let preferenceKeys = ["quickActions", "showAppIcons", "voiceMode", "allowServerRecognition",
-                                 "globalPushToTalk", "showMenuBarIcon", "showNowPlaying", "animationFeedback",
-                                 "checkConnectionOnOpen", "airPlayReceiverNames"]
+    static let preferenceKeys = PreferencesMigration.preferenceKeys
 
-    /// Also moved from pre-release builds (`local.fireremote.app`): the settings window's position.
-    static let migratedKeys = preferenceKeys + ["NSWindow Frame ZAPSettingsWindow"]  // AppKit's autosave key
 
     /// Before anything reads a preference: settings from pre-release builds move to `local.zap.app` once.
     static func migrateLegacyPreferences() {
         guard Bundle.main.bundleIdentifier == "local.zap.app", !isOfflinePreview,
               let legacy = UserDefaults(suiteName: PreferencesMigration.legacyDomain) else { return }
-        PreferencesMigration.migrate(from: legacy, to: UserDefaults.standard, keys: migratedKeys) {
+        PreferencesMigration.migrate(from: legacy, to: UserDefaults.standard, keys: PreferencesMigration.migratedKeys) {
             UserDefaults.standard.removePersistentDomain(forName: PreferencesMigration.legacyDomain)
             UserDefaults.standard.removePersistentDomain(forName: PreferencesMigration.legacyPreviewDomain)
         }
