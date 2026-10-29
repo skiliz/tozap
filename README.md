@@ -185,6 +185,7 @@ ZAP talks to:
 - your Fire TV;
 - by default, Amazon's image servers for the icons of your TV's apps (Settings → Advanced to turn off);
 - in Alexa mode, Amazon's Alexa service;
+- Apple's speech servers, only if your Mac can't recognise Italian on-device and you allow it in Settings → Voice;
 - GitHub, only when you click Check for Updates.
 
 There is no account, no analytics and no telemetry. The microphone is used only while you hold push-to-talk,
@@ -231,4 +232,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Reports from other Fire TV models are es
 
 ---
 
-<sub>ZAP is an independent third-party application and is not affiliated with, endorsed by, or sponsored by Amazon. Amazon, Fire TV, Fire OS and Alexa are trademarks of Amazon.com, Inc. or its affiliates. Apple, AirPlay and macOS are trademarks of Apple Inc., registered in the U.S. and other countries and regions. AirPlay receiver apps for Fire TV are third-party apps, not made or certified by Apple. ZAP is unrelated to the ZAP web security scanner (ZAP by Checkmarx, formerly OWASP ZAP).</sub>
+<sub>ZAP is an independent third-party application and is not affiliated with, endorsed by, or sponsored by Amazon. Amazon, Fire TV, Fire OS and Alexa are trademarks of Amazon.com, Inc. or its affiliates. Apple, AirPlay and macOS are trademarks of Apple Inc., registered in the U.S. and other countries and regions. AirPlay receiver apps for Fire TV are third-party apps, not made or certified by Apple. ZAP is unrelated to the ZAP web security scanner (ZAP by Checkmarx, formerly OWASP ZAP). Other product names are trademarks of their respective owners and are used only to describe compatibility.</sub>

@@ -70,10 +70,8 @@ final class MirroringCoordinator {
             found = await visibleReceivers(seconds: 10, tvHost: tvHost)
         }
         let onTV = found.filter(\.onTV)
-        // With a paired TV only its own receiver counts; another AirPlay device (an Apple TV, a speaker) is
-        // never presented as the TV's receiver.
-        let shown = tvHost == nil ? found : onTV
-        stage = shown.isEmpty ? .notFound : .guide(shown.map(\.name))
+        let shown = AirPlayReceiverChoice.shown(found.map { ($0.name, $0.onTV) }, tvPaired: tvHost != nil)
+        stage = shown.isEmpty ? .notFound : .guide(shown)
         log.notice("mirroring: \(String(describing: self.stage), privacy: .private)")
         // Only the paired TV's own receiver is remembered (for the menu bar's mirroring light) — never the
         // names of other devices on the network.
@@ -126,7 +124,7 @@ final class MirroringCoordinator {
         guard let tvHost else { return services.map { Receiver(name: $0.name, onTV: false) } }
         return await withTaskGroup(of: Receiver.self) { group in
             for service in services {
-                group.addTask { Receiver(name: service.name, onTV: await Bonjour.resolveIPv4(service, timeout: 2) == tvHost) }
+                group.addTask { Receiver(name: service.name, onTV: await Bonjour.resolveIPv4(service, timeout: 4) == tvHost) }
             }
             var result: [Receiver] = []
             for await receiver in group { result.append(receiver) }

@@ -102,6 +102,15 @@ public struct MenuBarStatus: Equatable, Sendable {
 
 /// Matching a connected display to an AirPlay receiver ZAP has seen: macOS names an AirPlay display after the
 /// receiver it streams to.
+/// Which AirPlay receivers Mirroring presents. With a paired TV only receivers at the TV's own address count,
+/// so another AirPlay device (an Apple TV, a speaker) is never shown as the TV's receiver; without one, any
+/// receiver the Mac can see.
+public enum AirPlayReceiverChoice {
+    public static func shown(_ receivers: [(name: String, onTV: Bool)], tvPaired: Bool) -> [String] {
+        (tvPaired ? receivers.filter(\.onTV) : receivers).map(\.name)
+    }
+}
+
 public enum AirPlayDisplay {
     public static func matches(screenName: String, receiver: String) -> Bool {
         let receiver = receiver.trimmingCharacters(in: .whitespaces)

@@ -47,13 +47,18 @@ cp Resources/AppIcon.icns LICENSE THIRD_PARTY_NOTICES.md "$APP/Contents/Resource
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 plutil -lint "$APP/Contents/Info.plist" >/dev/null
 
-# Signing: a Developer ID identity (ZAP_SIGN_IDENTITY) gets the hardened runtime and the microphone
-# entitlement; without one the bundle is ad-hoc signed (see docs/RELEASING.md for what that means).
+xattr -cr "$APP"  # no extended attributes (e.g. provenance) end up in the ZIP as ._ files
+
+# Signing: always the hardened runtime with the microphone entitlement. A Developer ID identity
+# (ZAP_SIGN_IDENTITY) adds a secure timestamp; without one the bundle is ad-hoc signed (docs/RELEASING.md).
 if [[ -n "${ZAP_SIGN_IDENTITY:-}" ]]; then
   codesign --force --options runtime --timestamp --entitlements Resources/ZAP.entitlements \
     --sign "$ZAP_SIGN_IDENTITY" "$APP"
 else
-  codesign --force --sign - "$APP"
+  codesign --force --options runtime --entitlements Resources/ZAP.entitlements --sign - "$APP"
 fi
 codesign --verify --strict "$APP"
+for file in LICENSE THIRD_PARTY_NOTICES.md; do  # MIT: the license travels with every copy of the app
+  [[ -f "$APP/Contents/Resources/$file" ]] || { echo "missing $file in the bundle"; exit 1; }
+done
 echo "built: $PWD/$APP ($(lipo -archs "$APP/Contents/MacOS/ZAP"))"

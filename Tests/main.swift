@@ -236,13 +236,6 @@ if let notices = repositoryText("THIRD_PARTY_NOTICES.md")?.lowercased() {
           && notices.contains("they belong to their respective owners, and screenshots that show them do not imply any affiliation"),
           "app icon ownership notice stays in THIRD_PARTY_NOTICES.md")
 }
-if FileManager.default.fileExists(atPath: "build/ZAP Remote.app") {
-    for file in ["LICENSE", "THIRD_PARTY_NOTICES.md"] {
-        check(FileManager.default.fileExists(atPath: "build/ZAP Remote.app/Contents/Resources/\(file)"),
-              "the app bundle ships \(file)")
-    }
-}
-
 // MARK: Media buttons say what they send (the Fire TV interface has no previous/next)
 
 check(MediaCommand.allCases == [.playPause, .forward, .rewind], "only Play/Pause, Fast-forward and Rewind exist")
@@ -268,7 +261,7 @@ check(semver("1.0.0-beta.2") < semver("1.0.0") && semver("1.0.0-alpha") < semver
       "prereleases follow SemVer precedence")
 check(semver("1.0.0+5") == semver("1.0.0"), "build metadata is ignored")
 check(semver("2.0.0-rc.1").isPrerelease && !semver("2.0.0").isPrerelease, "prereleases are recognised")
-for bad in ["", "abc", "1.2.3.4", "1..2", "1.2.x", "1.0.0-", "1.0.0-be..ta", "１.0.0", "1.0.0-beta!"] {
+for bad in ["", "abc", "1.2.3.4", "1..2", "1.2.x", "1.0.0-", "1.0.0-be..ta", "１.0.0", "1.0.0-beta!", "1.0.0-bèta"] {
     check(SemanticVersion(bad) == nil, "invalid version rejected: \(bad)")
 }
 
@@ -307,6 +300,9 @@ check(evaluate(403, headers: ["X-RateLimit-Remaining": "0", "X-RateLimit-Reset":
 check(evaluate(429, headers: ["Retry-After": "60"]) == .rateLimited(retryAfter: Date(timeIntervalSince1970: 1060)),
       "secondary rate limit with Retry-After")
 check(evaluate(429) == .rateLimited(retryAfter: nil), "429 without headers is still a rate limit")
+check(evaluate(429, headers: ["Retry-After": "inf"]) == .rateLimited(retryAfter: nil)
+      && evaluate(403, headers: ["X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "nan"]) == .rateLimited(retryAfter: nil),
+      "non-finite rate-limit times are ignored")
 check(evaluate(403) == .serverError(403), "a plain 403 is not mistaken for a rate limit")
 check(evaluate(500) == .serverError(500) && evaluate(301) == .serverError(301), "other statuses are server errors")
 check(evaluate(200, Data("not json".utf8)) == .invalidResponse, "invalid JSON is never a success")
@@ -323,6 +319,19 @@ var unknownVersionResult: UpdateCheckResult?
 Task { unknownVersionResult = await UpdateChecker.check(installedVersion: "—"); semaphore.signal() }
 semaphore.wait()
 check(unknownVersionResult == .unknownInstalledVersion, "an unreadable installed version stops before any request")
+check([URLError.Code.notConnectedToInternet, .timedOut, .cannotFindHost, .networkConnectionLost, .dnsLookupFailed]
+      .allSatisfy(UpdateChecker.networkFailures.contains)
+      && !UpdateChecker.networkFailures.contains(.serverCertificateUntrusted)
+      && !UpdateChecker.networkFailures.contains(.badServerResponse),
+      "offline and timeouts are 'network unavailable'; TLS and protocol errors are not")
+
+typealias Seen = (name: String, onTV: Bool)
+let seen: [Seen] = [("Android AirPlay", true), ("Living Room Apple TV", false)]
+check(AirPlayReceiverChoice.shown(seen, tvPaired: true) == ["Android AirPlay"], "with a paired TV, only its own receiver is shown")
+check(AirPlayReceiverChoice.shown([("Living Room Apple TV", false)], tvPaired: true).isEmpty,
+      "another AirPlay device is never presented as the TV's receiver")
+check(AirPlayReceiverChoice.shown(seen, tvPaired: false) == ["Android AirPlay", "Living Room Apple TV"],
+      "without a paired TV, every visible receiver is listed")
 
 let caskroom: Set<String> = ["/opt/homebrew/Caskroom/zap-remote"]
 check(InstallationSource.detect(bundlePath: "/Applications/ZAP Remote.app", home: "/Users/u",

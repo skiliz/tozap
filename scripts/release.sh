@@ -12,6 +12,7 @@
 set -euo pipefail
 cd "${0:A:h}/.."
 
+unset ZAP_BUILD_DIR   # releases are always built, tested and packaged from build/
 MODE="${ZAP_RELEASE_MODE:-developer-id}"
 [[ -z "${ZAP_DEVTOOLS:-}" ]] || { echo "Unset ZAP_DEVTOOLS: releases never contain the developer tools."; exit 1; }
 case "$MODE" in
@@ -36,9 +37,15 @@ TAG="v$VERSION"
 TAP="${ZAP_TAP_DIR:-../homebrew-tap}"
 
 [[ -z "$(git status --porcelain)" ]] || { echo "Commit your changes first."; exit 1; }
+[[ "$(git rev-parse --abbrev-ref HEAD)" == main ]] || { echo "Release from main."; exit 1; }
+git fetch -q origin main
+[[ "$(git rev-parse HEAD)" == "$(git rev-parse origin/main)" ]] || { echo "main must match origin/main: push or pull first."; exit 1; }
 git rev-parse "$TAG" >/dev/null 2>&1 && { echo "$TAG already exists."; exit 1; }
 grep -q "## \[$VERSION\] - [0-9]" CHANGELOG.md || { echo "Add a dated CHANGELOG.md entry for $VERSION first."; exit 1; }
 [[ -f "$TAP/templates/$TEMPLATE" ]] || { echo "Homebrew tap template $TEMPLATE not found in $TAP."; exit 1; }
+# The template must have exactly the two placeholders the script fills, checked before anything is tagged.
+[[ "$(grep -o "@[A-Z0-9]*@" "$TAP/templates/$TEMPLATE" | sort -u | tr '\n' ' ')" == "@SHA256@ @VERSION@ " ]] \
+  || { echo "$TEMPLATE must contain exactly @VERSION@ and @SHA256@."; exit 1; }
 
 scripts/build.sh test
 APP="build/ZAP Remote.app"

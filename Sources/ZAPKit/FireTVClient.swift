@@ -229,8 +229,10 @@ public final class FireTVClient: @unchecked Sendable {
     /// Developer CLI only (`zapctl probe`): one request to a `/v1/` path with the paired credentials, for testing
     /// undocumented actions while someone watches the TV. An HTTP answer, even 200, proves nothing by itself.
     public func probe(_ method: String, _ path: String, json: [String: Any]? = nil) async -> (status: Int?, body: String) {
-        guard ["GET", "POST"].contains(method), path.hasPrefix("/v1/"), !path.contains("..") else {
-            return (nil, "refused: only GET/POST to /v1/ paths")
+        let allowed = Set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/_-.?=&")
+        guard ["GET", "POST"].contains(method), path.hasPrefix("/v1/"), !path.contains(".."),
+              path.allSatisfy(allowed.contains), URL(string: "https://\(host):8080\(path)") != nil else {
+            return (nil, "refused: only GET/POST to plain /v1/ paths")
         }
         do {
             let data = try await rest(method, path, json: json)

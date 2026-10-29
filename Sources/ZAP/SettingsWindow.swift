@@ -234,6 +234,8 @@ struct SettingsRootView: View {
         .foregroundStyle(DS.Palette.textPrimary)
         .tint(DS.Settings.on)
         .environment(\.colorScheme, .dark)
+        // At window level, so the result of Check for Updates appears even if another section is open by then.
+        .modifier(UpdateResultAlert(navigation: navigation))
     }
 }
 

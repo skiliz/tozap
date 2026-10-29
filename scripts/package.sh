@@ -7,6 +7,8 @@ cd "${0:A:h}/.."
 VERSION=$(plutil -extract CFBundleShortVersionString raw Resources/Info.plist)
 APP="build/ZAP Remote.app"
 [[ -d "$APP" ]] || { echo "Build first: scripts/build.sh"; exit 1; }
+BUILT=$(plutil -extract CFBundleShortVersionString raw "$APP/Contents/Info.plist")
+[[ "$BUILT" == "$VERSION" ]] || { echo "build/ holds version $BUILT, not $VERSION: rebuild with scripts/build.sh."; exit 1; }
 codesign --verify --strict "$APP"
 # Never package a developer build: it contains the automation hooks (ZAP_DEVTOOLS).
 if /usr/libexec/PlistBuddy -c "Print :CFBundleURLTypes" "$APP/Contents/Info.plist" >/dev/null 2>&1 \

@@ -31,7 +31,7 @@ With **Settings → Advanced → Show app icons** on (the default), ZAP download
 installed app. It does this when it reads the TV's app list, and at launch for icons it hasn't saved yet.
 The icons come from Amazon's image servers (`m.media-amazon.com`, `images-na.ssl-images-amazon.com`); other
 hosts and redirects are refused. These requests show Amazon your public IP address, the time, and which
-apps are on your TV. ZAP sends no cookies, keeps no HTTP cache and identifies itself only as `ZAP`.
+apps are on your TV. ZAP sends no cookies and keeps no HTTP cache; the requests carry only standard HTTP headers, with the user agent `ZAP`.
 
 Turn the option off to keep ZAP's own traffic on your local network, apart from Alexa mode and optional
 Apple server recognition. Neutral symbols are shown instead, and **Remove** deletes the saved icons.
@@ -40,8 +40,8 @@ Apple server recognition. Neutral symbols are shown instead, and **Remove** dele
 
 ZAP never checks for updates by itself. When you click **Settings → About → Check for Updates**, it sends one
 HTTPS request to GitHub's public API (`api.github.com/repos/skiliz/zap/releases/latest`) to read the latest
-release's version. The request carries no account, token, cookie or identifier other than the user agent
-`ZAP`, and nothing is cached. GitHub sees your IP address and the time, under GitHub's privacy statement.
+release's version. The request carries no account, token or cookie, only standard HTTP headers (such as your
+preferred language) with the user agent `ZAP`, and nothing is cached. GitHub sees your IP address and the time, under GitHub's privacy statement.
 Nothing is downloaded or installed: if a newer version exists, ZAP shows it and opens the release page in your
 browser only if you ask. To check whether ZAP was installed with Homebrew, ZAP looks for Homebrew's
 `Caskroom/zap-remote` folder on your Mac; nothing about it is sent anywhere.

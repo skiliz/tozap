@@ -29,8 +29,8 @@ public struct SemanticVersion: Comparable, CustomStringConvertible, Sendable {
         if let dash = core.firstIndex(of: "-") {
             pre = core[core.index(after: dash)...].split(separator: ".", omittingEmptySubsequences: false).map(String.init)
             core = String(core[..<dash])
-            let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-"))
-            guard !pre.isEmpty, pre.allSatisfy({ !$0.isEmpty && $0.unicodeScalars.allSatisfy(allowed.contains) }) else { return nil }
+            guard !pre.isEmpty, pre.allSatisfy({ !$0.isEmpty && $0.allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-") } })
+            else { return nil }
         }
         let parts = core.split(separator: ".", omittingEmptySubsequences: false)
         guard (1...3).contains(parts.count),
@@ -104,8 +104,14 @@ public enum UpdateChecker {
         request.setValue("2022-11-28", forHTTPHeaderField: "X-GitHub-Api-Version")
         request.setValue("ZAP", forHTTPHeaderField: "User-Agent")
         do {
-            let (data, response) = try await session.data(for: request)
+            let (bytes, response) = try await session.bytes(for: request)
             guard let http = response as? HTTPURLResponse else { return .invalidResponse }
+            // Read at most one byte past the cap, so an oversized answer is never held in full.
+            var data = Data()
+            for try await byte in bytes {
+                data.append(byte)
+                if data.count > maxResponseBytes { break }
+            }
             return evaluate(statusCode: http.statusCode,
                             header: { http.value(forHTTPHeaderField: $0) },
                             body: data, installed: installed)
@@ -116,7 +122,7 @@ public enum UpdateChecker {
         }
     }
 
-    static let networkFailures: Set<URLError.Code> = [
+    public static let networkFailures: Set<URLError.Code> = [
         .notConnectedToInternet, .networkConnectionLost, .cannotFindHost, .cannotConnectToHost,
         .dnsLookupFailed, .timedOut, .dataNotAllowed, .internationalRoamingOff, .callIsActive,
     ]
@@ -142,11 +148,12 @@ public enum UpdateChecker {
         case 404:
             return .noPublicRelease
         case 403, 429:
-            if let retry = header("Retry-After").flatMap(Double.init) {
+            if let retry = header("Retry-After").flatMap(Double.init), retry.isFinite, (0...86_400).contains(retry) {
                 return .rateLimited(retryAfter: now.addingTimeInterval(retry))
             }
             if header("X-RateLimit-Remaining") == "0" || statusCode == 429 {
-                let reset = header("X-RateLimit-Reset").flatMap(Double.init).map(Date.init(timeIntervalSince1970:))
+                let reset = header("X-RateLimit-Reset").flatMap(Double.init)
+                    .flatMap { $0.isFinite && $0 > 0 ? Date(timeIntervalSince1970: $0) : nil }
                 return .rateLimited(retryAfter: reset)
             }
             return .serverError(statusCode)

@@ -966,7 +966,6 @@ struct AboutSettingsPage: View {
                 .frame(maxWidth: .infinity, minHeight: proxy.size.height)
             }
         }
-        .modifier(UpdateResultAlert(navigation: navigation))
     }
 }
 
@@ -1121,7 +1120,7 @@ private struct AboutRowButton<Label: View>: View {
 
 /// The outcome of Check for Updates as a standard alert. Only a confirmed newer stable release offers a
 /// download, and only from its GitHub release page; Homebrew installs are pointed at `brew upgrade`.
-private struct UpdateResultAlert: ViewModifier {
+struct UpdateResultAlert: ViewModifier {
     let navigation: SettingsNavigation
 
     func body(content: Content) -> some View {
