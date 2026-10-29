@@ -4,6 +4,7 @@ import Foundation
 public enum ZAPProject {
     public static let repository = URL(string: "https://github.com/skiliz/tozap")!
     public static let releasesPage = URL(string: "https://github.com/skiliz/tozap/releases")!
+    public static let license = URL(string: "https://github.com/skiliz/tozap/blob/main/LICENSE")!
     /// The latest published full release: GitHub never returns drafts or prereleases here, and answers 404
     /// when there is none.
     public static let latestReleaseAPI = URL(string: "https://api.github.com/repos/skiliz/tozap/releases/latest")!

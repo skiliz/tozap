@@ -38,8 +38,8 @@ First public release.
   - Launch at login uses macOS login items.
   - The menu bar icon can be hidden: open to.zap again to reach Settings.
   - Copy Summary copies a diagnostic summary with no personal data.
-  - About shows the app's identity, version, the GitHub repository and Check for Updates. The license and
-    third-party notices ship inside the app bundle and in the repository.
+  - About shows the app's icon, name, version and maker, with GitHub Repository, MIT License and Check for
+    Updates. The license and third-party notices ship inside the app bundle and in the repository.
 
 ### Security and privacy
 - **TLS to the TV:** always verified against the Amazon root pinned at pairing. Pairing accepts only the

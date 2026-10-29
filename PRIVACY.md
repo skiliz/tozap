@@ -46,7 +46,8 @@ Nothing is downloaded or installed: if a newer version exists, to.zap shows it a
 browser only if you ask. To check whether to.zap was installed with Homebrew, to.zap looks for Homebrew's
 `Caskroom/tozap-remote` folder on your Mac; nothing about it is sent anywhere.
 
-**GitHub Repository** simply opens to.zap's page on github.com in your browser.
+**GitHub Repository** simply opens to.zap's page on github.com in your browser. **MIT License** opens the license
+file included in the app, on your Mac.
 
 ## Microphone
 
