@@ -95,7 +95,7 @@ ZAP is distributed without a paid Apple Developer account, so it is **not signed
 notarized by Apple** — Apple hasn't checked it. macOS therefore says it can't verify ZAP the first time you
 open it. If you downloaded it from this repository's releases or installed it with the Homebrew tap above:
 
-1. Open **ZAP Remote** from Applications, and click **Done** in the warning.
+1. Open **ZAP Remote** from Applications, and click **Done** in the warning (**Cancel** on macOS 14).
 2. Within about an hour, open **System Settings → Privacy & Security**, scroll to **Security**, click
    **Open Anyway** next to the message about ZAP Remote, and enter your login password.
 3. Click **Open** to confirm.

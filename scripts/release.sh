@@ -64,9 +64,21 @@ if [[ -n "${ZAP_RELEASE_DIST:-}" ]]; then
     && [[ "$(lipo -archs "$APP/Contents/MacOS/ZAP")" == "arm64" ]] \
     || { echo "The prebuilt app doesn't match version $VERSION, local.zap.app and arm64."; exit 1; }
   codesign --verify --strict --deep "$APP"
-  codesign -dv "$APP" 2>&1 | grep -q "Signature=adhoc" || { echo "Expected an ad-hoc signature."; exit 1; }
-  rm -rf "$CHECK"
+  [[ "$(codesign -dv "$APP" 2>&1)" == *"Signature=adhoc"* ]] || { echo "Expected an ad-hoc signature."; exit 1; }
+  [[ "$(codesign -dv "$APP" 2>&1)" == *"(adhoc,runtime)"* ]] || { echo "Expected the hardened runtime."; exit 1; }
+  [[ "$(codesign -d --entitlements - --xml "$APP" 2>/dev/null | grep -o 'com\.apple\.[a-z.-]*' | sort -u)" \
+     == "com.apple.security.device.audio-input" ]] || { echo "Unexpected entitlements."; exit 1; }
+  # The DMG must hold the same app as the ZIP.
+  MOUNT=$(mktemp -d)
+  hdiutil attach -quiet -readonly -nobrowse -mountpoint "$MOUNT" "dist/ZAP-$VERSION.dmg"
+  if diff -rq "$APP" "$MOUNT/ZAP Remote.app" >/dev/null; then SAME=yes; else SAME=no; fi
+  hdiutil detach -quiet "$MOUNT"
+  [[ "$SAME" == yes ]] || { echo "The DMG's app differs from the ZIP's."; exit 1; }
   scripts/build.sh test   # the tagged source still builds and passes its tests
+  # The build is reproducible: the tagged source must produce the very binary being published.
+  cmp -s "build/ZAP Remote.app/Contents/MacOS/ZAP" "$APP/Contents/MacOS/ZAP" \
+    || { echo "The tagged source doesn't rebuild the published binary."; exit 1; }
+  rm -rf "$CHECK"
 else
   scripts/build.sh test
 fi
@@ -77,7 +89,7 @@ if [[ "$MODE" == developer-id ]]; then
   scripts/notarize.sh   # packages, notarizes, staples and checks Gatekeeper
 else
   codesign --verify --strict --deep "$APP"
-  codesign -dv "$APP" 2>&1 | grep -q "Signature=adhoc" || { echo "Expected an ad-hoc signature."; exit 1; }
+  [[ "$(codesign -dv "$APP" 2>&1)" == *"Signature=adhoc"* ]] || { echo "Expected an ad-hoc signature."; exit 1; }
   [[ -n "${ZAP_RELEASE_DIST:-}" ]] || scripts/package.sh
   # Informational: Gatekeeper is expected to refuse an app that isn't notarized.
   spctl --assess --type execute "$APP" 2>/dev/null && echo "note: Gatekeeper accepted the app" \

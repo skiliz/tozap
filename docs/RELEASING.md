@@ -40,7 +40,9 @@ Developer ID mode only:
    `ZAP_SIGN_IDENTITY="Developer ID Application: <legal name> (<TEAMID>)" ZAP_NOTARY_PROFILE=<profile> scripts/release.sh`).
    To publish an artifact that was already built from the same source and tested on a clean account, add
    `ZAP_RELEASE_DIST=<folder with ZAP-<version>.zip, .dmg and SHA256SUMS.txt>`: the script verifies it and uploads
-   those exact files instead of rebuilding (a rebuilt ZIP would have a different SHA-256). The script:
+   those exact files instead of rebuilding (a rebuilt ZIP would have a different SHA-256). Commits after the
+   artifact was built may only touch files outside the app bundle (such as dating CHANGELOG.md): the script
+   rebuilds the tagged source and requires the identical binary. The script:
    1. refuses developer builds, a dirty tree, an existing tag or a missing dated changelog entry;
    2. builds arm64 and runs the tests;
    3. ad-hoc mode: checks the ad-hoc signature and packages; Developer ID mode: packages, notarizes, staples
@@ -64,7 +66,7 @@ Developer ID mode only:
    - `brew upgrade --cask skiliz/tap/zap-remote` keeps the pairing. In ad-hoc mode Homebrew warns that the signer
      changed, macOS asks for approval again and may ask again for Microphone, Speech Recognition and Local
      Network; check that the login item still works;
-   - `brew uninstall --cask zap-remote` keeps the data, and `--zap` removes `~/Library/Application Support/ZAP Remote`.
+   - `brew uninstall --cask zap-remote` keeps the data, and `--zap` removes `~/Library/Application Support/ZAP Remote` and `~/Library/Preferences/local.zap.app.plist`.
 
 Never commit signing certificates, passwords, API keys or tokens. Signing credentials come from the local
 keychain and environment only. Never attach third-party binaries (such as the mirroring receiver's APK) to a

@@ -12,8 +12,8 @@ BUILT=$(plutil -extract CFBundleShortVersionString raw "$APP/Contents/Info.plist
 codesign --verify --strict "$APP"
 # Never package a developer build: it contains the automation hooks (ZAP_DEVTOOLS).
 if /usr/libexec/PlistBuddy -c "Print :CFBundleURLTypes" "$APP/Contents/Info.plist" >/dev/null 2>&1 \
-   || otool -L "$APP/Contents/MacOS/ZAP" | grep -q ScreenCaptureKit \
-   || strings "$APP/Contents/MacOS/ZAP" | grep -q "automation is off"; then
+   || [[ "$(otool -L "$APP/Contents/MacOS/ZAP")" == *ScreenCaptureKit* ]] \
+   || [[ "$(strings "$APP/Contents/MacOS/ZAP")" == *"automation is off"* ]]; then
   echo "This is a developer build (ZAP_DEVTOOLS). Rebuild with scripts/build.sh before packaging."
   exit 1
 fi

@@ -10,7 +10,7 @@ cd "${0:A:h}/.."
 VERSION=$(plutil -extract CFBundleShortVersionString raw Resources/Info.plist)
 APP="build/ZAP Remote.app"
 codesign --verify --strict --deep "$APP"
-codesign -dv "$APP" 2>&1 | grep -q "(runtime)" || { echo "Not signed with the hardened runtime: build with ZAP_SIGN_IDENTITY."; exit 1; }
+[[ "$(codesign -dv "$APP" 2>&1)" == *"runtime"* ]] || { echo "Not signed with the hardened runtime: build with ZAP_SIGN_IDENTITY."; exit 1; }
 
 scripts/package.sh
 xcrun notarytool submit "dist/ZAP-$VERSION.zip" --keychain-profile "$ZAP_NOTARY_PROFILE" --wait
