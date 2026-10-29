@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+<defs>
+<linearGradient id="tile" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3C3D41"/><stop offset="1" stop-color="#17181B"/></linearGradient>
+<linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#313236"/><stop offset="1" stop-color="#151619"/></linearGradient>
+<linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ECEDEF"/><stop offset="0.35" stop-color="#A4A6AB"/><stop offset="0.7" stop-color="#5D5F64"/><stop offset="1" stop-color="#3A3B3F"/></linearGradient>
+<linearGradient id="pad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B0C0E"/><stop offset="1" stop-color="#18191C"/></linearGradient>
+<linearGradient id="key" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A3B40"/><stop offset="1" stop-color="#1D1E22"/></linearGradient>
+<linearGradient id="button" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#222327"/><stop offset="1" stop-color="#101113"/></linearGradient>
+<filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="22" stdDeviation="22" flood-color="#000" flood-opacity="0.6"/></filter>
+</defs>
+<rect x="100.0" y="100.0" width="824.0" height="824.0" rx="185.0" fill="url(#tile)"/>
+<rect x="101.5" y="101.5" width="821.0" height="821.0" rx="183.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="3"/>
+<rect x="340.0" y="178.0" width="344.0" height="668.0" rx="160.0" fill="url(#body)" filter="url(#shadow)"/>
+<rect x="344.5" y="182.5" width="335.0" height="659.0" rx="155.5" fill="none" stroke="url(#rim)" stroke-width="9"/>
+<circle cx="512" cy="356.0" r="141.0" fill="url(#pad)" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="3"/>
+<polygon points="512.0,241.5 495.5,267.0 528.5,267.0" fill="#E6E6E6"/>
+<polygon points="512.0,470.5 528.5,445.0 495.5,445.0" fill="#E6E6E6"/>
+<polygon points="397.5,356.0 423.0,372.5 423.0,339.5" fill="#E6E6E6"/>
+<polygon points="626.5,356.0 601.0,339.5 601.0,372.5" fill="#E6E6E6"/>
+<circle cx="512" cy="356.0" r="55.0" fill="url(#key)" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="2.5"/>
+<circle cx="512" cy="588.0" r="54.0" fill="url(#button)" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="2.5"/>
+<rect x="501" y="554.0" width="22" height="36" rx="11" fill="#E6E6E6"/>
+<path d="M493,578.0 a19,19 0 0 0 38,0 M512,597.0 v10 M502,607.0 h20" fill="none" stroke="#E6E6E6" stroke-width="4.5" stroke-linecap="round"/>
+<circle cx="512" cy="724.0" r="54.0" fill="url(#button)" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="2.5"/>
+<g fill="#E0E0E0"><circle cx="490" cy="724.0" r="6.5"/><circle cx="512" cy="724.0" r="6.5"/><circle cx="534" cy="724.0" r="6.5"/></g>
+</svg>

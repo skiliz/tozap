@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - name: Build and run tests
+        run: scripts/build.sh test
+      - name: Package (refuses developer builds)
+        run: scripts/package.sh
+      - name: Check the release build has no developer tools
+        run: |
+          ! /usr/libexec/PlistBuddy -c "Print :CFBundleURLTypes" "build/ZAP Remote.app/Contents/Info.plist"
+          ! otool -L "build/ZAP Remote.app/Contents/MacOS/ZAP" | grep -q ScreenCaptureKit

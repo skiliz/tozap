@@ -1,0 +1,19 @@
+# build output and release artifacts (published as GitHub Release assets, never committed)
+/build/
+/dist/
+*.dmg
+*.zip
+
+# credentials, signing material, local device data
+*.p12
+*.cer
+*.mobileprovision
+*.keychain
+.env
+device.json
+*.log
+
+# third-party binaries
+*.apk
+
+.DS_Store

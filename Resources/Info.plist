@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Kept from the pre-1.0 "Fire Remote" builds so existing permissions and settings carry over. -->
+	<key>CFBundleIdentifier</key>
+	<string>local.fireremote.app</string>
+	<key>CFBundleName</key>
+	<string>ZAP</string>
+	<key>CFBundleDisplayName</key>
+	<string>ZAP</string>
+	<key>CFBundleExecutable</key>
+	<string>ZAP</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>ZAP talks to your Fire TV on your local network to send remote-control commands, and looks for an AirPlay receiver for screen mirroring.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_amzn-wplay._tcp</string>
+		<string>_airplay._tcp</string>
+	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>ZAP uses the microphone only while you hold push-to-talk: to recognise voice commands on this Mac or, in Alexa mode, to send your voice through the Fire TV to Amazon's Alexa service. Nothing is recorded or stored.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>ZAP turns what you say while holding push-to-talk into remote commands. Recognition runs on this Mac; Apple's servers are used only if you allow it in Settings.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSHumanReadableCopyright</key>
+	<string>© 2026 Cosmos Agency — Cosmos Open Source. MIT License. Not affiliated with Amazon.</string>
+</dict>
+</plist>
