@@ -1,6 +1,6 @@
-# Screen Mirroring with ZAP
+# Screen Mirroring with to.zap
 
-ZAP's **Mirror** button helps you show your Mac's screen on a Fire TV. ZAP itself does not stream, receive
+to.zap's **Mirror** button helps you show your Mac's screen on a Fire TV. to.zap itself does not stream, receive
 or process video: macOS sends the picture, and an AirPlay receiver app on the TV shows it.
 
 ## Who does what
@@ -9,25 +9,25 @@ or process video: macOS sends the picture, and an AirPlay receiver app on the TV
 |---|---|---|
 | **macOS** | Captures, encodes and sends your screen over AirPlay when you choose the TV in **Control Center → Screen Mirroring** (or System Settings → Displays). It also stops the session. | Verified on hardware |
 | **AirPlay receiver app on the Fire TV** | Advertises an AirPlay receiver on your network, receives the stream and shows it. Fire TV has no AirPlay receiver of its own: its built-in "Display Mirroring" is Miracast, which macOS doesn't support. | Verified on hardware (AirPlay Server) |
-| **ZAP** | 1. Looks for AirPlay receivers on your network (Bonjour, 2 seconds) and checks which one has the TV's address. 2. If none is there, asks the TV to open AirPlay Server through the same remote-control interface that opens other apps, then looks again (up to 10 seconds). 3. Shows the result and points you to Control Center. Pressing Mirror again while a receiver is ready opens System Settings → Displays. | Verified from code and on hardware |
+| **to.zap** | 1. Looks for AirPlay receivers on your network (Bonjour, 2 seconds) and checks which one has the TV's address. 2. If none is there, asks the TV to open AirPlay Server through the same remote-control interface that opens other apps, then looks again (up to 10 seconds). 3. Shows the result and points you to Control Center. Pressing Mirror again while a receiver is ready opens System Settings → Displays. | Verified from code and on hardware |
 
-ZAP **doesn't** host an AirPlay server, doesn't open any listening port, and doesn't capture or transmit your
+to.zap **doesn't** host an AirPlay server, doesn't open any listening port, and doesn't capture or transmit your
 screen. macOS doesn't let apps start Screen Mirroring by themselves, so choosing the TV is always your click.
 
 ### What is and isn't known
 
 | Question | Answer | Evidence |
 |---|---|---|
-| Does ZAP need to stay open while mirroring? | No. ZAP was quit during an extended-display session and the TV kept showing the Mac; reopening ZAP picked the session up again | Verified on hardware |
+| Does to.zap need to stay open while mirroring? | No. to.zap was quit during an extended-display session and the TV kept showing the Mac; reopening to.zap picked the session up again | Verified on hardware |
 | What happens if you leave the receiver on the TV (Home)? | AirPlay Server keeps running in the background and the session continues | Verified on hardware |
-| How does it stop? | Stop Mirroring in Control Center → Screen Mirroring ends it, and ZAP's indicator turns off | Verified on hardware |
+| How does it stop? | Stop Mirroring in Control Center → Screen Mirroring ends it, and to.zap's indicator turns off | Verified on hardware |
 | Menu bar indicator (blue) and "Mirroring to TV" in the capsule | Shown while macOS uses the TV as a display | Verified on hardware when extending; mirror mode not checked separately |
-| Can ZAP tell whether the receiver app is installed? | No. Sideloaded apps are missing from the app list the TV reports, so ZAP only knows a receiver exists when it is running and visible on the network | Verified on hardware |
+| Can to.zap tell whether the receiver app is installed? | No. Sideloaded apps are missing from the app list the TV reports, so to.zap only knows a receiver exists when it is running and visible on the network | Verified on hardware |
 | Mirror and extended display | Both worked with AirPlay Server (1920×1080 when extending) | Verified on hardware |
 | Latency, resolution, audio | Chosen by macOS and the receiver; not measured | Not tested |
 | Protected video (DRM) | Appears black when mirrored | Expected (receiver documentation) |
 
-## The receiver ZAP is tested with: AirPlay Server
+## The receiver to.zap is tested with: AirPlay Server
 
 | | |
 |---|---|
@@ -40,9 +40,9 @@ screen. macOS doesn't let apps start Screen Mirroring by themselves, so choosing
 | Requirements | Android 7.0 or later according to its README (Fire OS 6, 7 and 8 meet this); 32-bit and 64-bit ARM builds |
 | Ads and tracking | F-Droid lists no anti-features, and its build file declares no advertising or analytics libraries |
 
-ZAP is not affiliated with AirPlay Server and **does not bundle, host or redistribute it**. You install it
+to.zap is not affiliated with AirPlay Server and **does not bundle, host or redistribute it**. You install it
 yourself, from its developer's channels. Other AirPlay receiver apps may work if they are already running
-on the TV, but they are not tested with ZAP, and ZAP never opens them.
+on the TV, but they are not tested with to.zap, and to.zap never opens them.
 
 AirPlay receiver apps for Fire TV are third-party apps, not made or certified by Apple.
 
@@ -67,7 +67,7 @@ Downloader. The steps above use the same file from F-Droid directly; that exact 
 
 ## Using it
 
-1. Press **Mirror** in the ZAP remote. ZAP opens the receiver on the TV and tells you when your Mac can see it.
+1. Press **Mirror** in the to.zap remote. to.zap opens the receiver on the TV and tells you when your Mac can see it.
 2. Open **Control Center → Screen Mirroring** and choose the receiver ("Android AirPlay"). macOS lets you
    mirror or extend your display.
 3. To stop, choose **Stop Mirroring** in Control Center → Screen Mirroring.

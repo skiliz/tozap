@@ -8,20 +8,20 @@ cd "${0:A:h}/.."
 : "${ZAP_NOTARY_PROFILE:?Set ZAP_NOTARY_PROFILE to a notarytool keychain profile}"
 
 VERSION=$(plutil -extract CFBundleShortVersionString raw Resources/Info.plist)
-APP="build/ZAP Remote.app"
+APP="build/to.zap.app"
 codesign --verify --strict --deep "$APP"
 [[ "$(codesign -dv "$APP" 2>&1)" == *"runtime"* ]] || { echo "Not signed with the hardened runtime: build with ZAP_SIGN_IDENTITY."; exit 1; }
 
 scripts/package.sh
-xcrun notarytool submit "dist/ZAP-$VERSION.zip" --keychain-profile "$ZAP_NOTARY_PROFILE" --wait
+xcrun notarytool submit "dist/tozap-$VERSION.zip" --keychain-profile "$ZAP_NOTARY_PROFILE" --wait
 xcrun stapler staple "$APP"
 scripts/package.sh                                   # repackage the stapled app
-xcrun notarytool submit "dist/ZAP-$VERSION.dmg" --keychain-profile "$ZAP_NOTARY_PROFILE" --wait
-xcrun stapler staple "dist/ZAP-$VERSION.dmg"
-(cd dist && shasum -a 256 "ZAP-$VERSION.dmg" "ZAP-$VERSION.zip" > SHA256SUMS.txt)
+xcrun notarytool submit "dist/tozap-$VERSION.dmg" --keychain-profile "$ZAP_NOTARY_PROFILE" --wait
+xcrun stapler staple "dist/tozap-$VERSION.dmg"
+(cd dist && shasum -a 256 "tozap-$VERSION.dmg" "tozap-$VERSION.zip" > SHA256SUMS.txt)
 
 # Gatekeeper must accept both, as it will on a user's Mac
 xcrun stapler validate "$APP"
 spctl --assess --type execute -vv "$APP"
-spctl --assess --type open --context context:primary-signature -vv "dist/ZAP-$VERSION.dmg"
+spctl --assess --type open --context context:primary-signature -vv "dist/tozap-$VERSION.dmg"
 cat dist/SHA256SUMS.txt

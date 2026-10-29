@@ -3,8 +3,8 @@ import Observation
 import ServiceManagement
 import ZAPKit
 
-/// Where ZAP keeps its preferences (the `local.zap.app` domain). The offline preview works on a copy
-/// (`local.zap.app.preview`), refreshed from the real preferences at each preview launch, so trying things out
+/// Where ZAP keeps its preferences (the `local.tozap.app` domain). The offline preview works on a copy
+/// (`local.tozap.app.preview`), refreshed from the real preferences at each preview launch, so trying things out
 /// changes nothing real.
 enum AppDefaults {
 #if ZAP_DEVTOOLS
@@ -17,19 +17,23 @@ enum AppDefaults {
     static let preferenceKeys = PreferencesMigration.preferenceKeys
 
 
-    /// Before anything reads a preference: settings from pre-release builds move to `local.zap.app` once.
+    /// Before anything reads a preference: settings from pre-release builds move to `local.tozap.app` once.
     static func migrateLegacyPreferences() {
-        guard Bundle.main.bundleIdentifier == "local.zap.app", !isOfflinePreview,
-              let legacy = UserDefaults(suiteName: PreferencesMigration.legacyDomain) else { return }
-        PreferencesMigration.migrate(from: legacy, to: UserDefaults.standard, keys: PreferencesMigration.migratedKeys) {
-            UserDefaults.standard.removePersistentDomain(forName: PreferencesMigration.legacyDomain)
-            UserDefaults.standard.removePersistentDomain(forName: PreferencesMigration.legacyPreviewDomain)
+        guard Bundle.main.bundleIdentifier == PreferencesMigration.currentDomain, !isOfflinePreview else { return }
+        let keys = PreferencesMigration.migratedKeys
+        let legacy = PreferencesMigration.legacyDomains.compactMap { UserDefaults(suiteName: $0) }
+        guard let source = legacy.first(where: { suite in keys.contains { suite.object(forKey: $0) != nil } }) ?? legacy.first
+        else { return }
+        PreferencesMigration.migrate(from: source, to: UserDefaults.standard, keys: keys) {
+            for domain in PreferencesMigration.legacyDomains + PreferencesMigration.legacyPreviewDomains {
+                UserDefaults.standard.removePersistentDomain(forName: domain)
+            }
         }
     }
 
     static let store: UserDefaults = {
         migrateLegacyPreferences()
-        guard isOfflinePreview, let preview = UserDefaults(suiteName: "local.zap.app.preview") else {
+        guard isOfflinePreview, let preview = UserDefaults(suiteName: PreferencesMigration.currentDomain + ".preview") else {
             return .standard
         }
         for key in preferenceKeys {

@@ -1,19 +1,19 @@
 #!/bin/zsh
-# Packages "build/ZAP Remote.app" into dist/ZAP-<version>.dmg, dist/ZAP-<version>.zip and dist/SHA256SUMS.txt.
+# Packages "build/to.zap.app" into dist/tozap-<version>.dmg, dist/tozap-<version>.zip and dist/SHA256SUMS.txt.
 # Run scripts/build.sh first.
 set -euo pipefail
 cd "${0:A:h}/.."
 
 VERSION=$(plutil -extract CFBundleShortVersionString raw Resources/Info.plist)
-APP="build/ZAP Remote.app"
+APP="build/to.zap.app"
 [[ -d "$APP" ]] || { echo "Build first: scripts/build.sh"; exit 1; }
 BUILT=$(plutil -extract CFBundleShortVersionString raw "$APP/Contents/Info.plist")
 [[ "$BUILT" == "$VERSION" ]] || { echo "build/ holds version $BUILT, not $VERSION: rebuild with scripts/build.sh."; exit 1; }
 codesign --verify --strict "$APP"
 # Never package a developer build: it contains the automation hooks (ZAP_DEVTOOLS).
 if /usr/libexec/PlistBuddy -c "Print :CFBundleURLTypes" "$APP/Contents/Info.plist" >/dev/null 2>&1 \
-   || [[ "$(otool -L "$APP/Contents/MacOS/ZAP")" == *ScreenCaptureKit* ]] \
-   || [[ "$(strings "$APP/Contents/MacOS/ZAP")" == *"automation is off"* ]]; then
+   || [[ "$(otool -L "$APP/Contents/MacOS/to.zap")" == *ScreenCaptureKit* ]] \
+   || [[ "$(strings "$APP/Contents/MacOS/to.zap")" == *"automation is off"* ]]; then
   echo "This is a developer build (ZAP_DEVTOOLS). Rebuild with scripts/build.sh before packaging."
   exit 1
 fi
@@ -24,14 +24,14 @@ mkdir -p $DIST
 
 # DMG: the app next to an Applications link, for drag-to-install
 STAGE=$(mktemp -d)
-ditto "$APP" "$STAGE/ZAP Remote.app"
+ditto "$APP" "$STAGE/to.zap.app"
 ln -s /Applications "$STAGE/Applications"
-hdiutil create -quiet -volname "ZAP $VERSION" -srcfolder "$STAGE" -fs HFS+ -format UDZO -ov "$DIST/ZAP-$VERSION.dmg"
+hdiutil create -quiet -volname "to.zap $VERSION" -srcfolder "$STAGE" -fs HFS+ -format UDZO -ov "$DIST/tozap-$VERSION.dmg"
 rm -rf "$STAGE"
 
 # ZIP: used by the Homebrew cask
 # No extended attributes or resource forks (macOS adds provenance data; the signature lives in _CodeSignature)
-ditto -c -k --norsrc --noextattr --keepParent "$APP" "$DIST/ZAP-$VERSION.zip"
+ditto -c -k --norsrc --noextattr --keepParent "$APP" "$DIST/tozap-$VERSION.zip"
 
-(cd $DIST && shasum -a 256 "ZAP-$VERSION.dmg" "ZAP-$VERSION.zip" > SHA256SUMS.txt)
+(cd $DIST && shasum -a 256 "tozap-$VERSION.dmg" "tozap-$VERSION.zip" > SHA256SUMS.txt)
 cat $DIST/SHA256SUMS.txt

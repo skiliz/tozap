@@ -217,11 +217,11 @@ check(repositoryText("README.md") != nil && repositoryText("LICENSE") != nil && 
       "README, LICENSE and THIRD_PARTY_NOTICES.md exist (missing files fail instead of skipping)")
 if let readme = repositoryText("README.md") {
     for notice in [
-        "ZAP is an independent third-party application and is not affiliated with, endorsed by, or sponsored by Amazon.",
+        "to.zap is an independent third-party application and is not affiliated with, endorsed by, or sponsored by Amazon.",
         "Amazon, Fire TV, Fire OS and Alexa are trademarks of Amazon.com, Inc. or its affiliates.",
         "Apple, AirPlay and macOS are trademarks of Apple Inc., registered in the U.S. and other countries and regions.",
         "AirPlay receiver apps for Fire TV are third-party apps, not made or certified by Apple.",
-        "ZAP is unrelated to the ZAP web security scanner (ZAP by Checkmarx, formerly OWASP ZAP).",
+        "to.zap is unrelated to the ZAP web security scanner (ZAP by Checkmarx, formerly OWASP ZAP) and to other products named ZAP or Tozap.",
     ] {
         check(readme.contains(notice), "README keeps the notice: \(notice.prefix(40))…")
     }
@@ -231,17 +231,20 @@ if let license = repositoryText("LICENSE") {
           "LICENSE keeps the MIT text and the copyright line")
 }
 if let notices = repositoryText("THIRD_PARTY_NOTICES.md")?.lowercased() {
-    check(notices.contains("zap contains no third-party code and has no package dependencies")
+    check(notices.contains("to.zap contains no third-party code and has no package dependencies")
           && notices.contains("no amazon software was decompiled and no amazon code, keys, firmware, apks or assets are included"),
           "THIRD_PARTY_NOTICES.md keeps the code and Amazon statements")
-    check(notices.contains("app icons shown on shortcut tiles are not part of zap")
+    check(notices.contains("app icons shown on shortcut tiles are not part of to.zap")
           && notices.contains("they belong to their respective owners, and screenshots that show them do not imply any affiliation"),
           "app icon ownership notice stays in THIRD_PARTY_NOTICES.md")
 }
 // MARK: Bundle identifier and the one-time move of pre-release preferences
 
 if let plist = NSDictionary(contentsOfFile: "Resources/Info.plist") {
-    check(plist["CFBundleIdentifier"] as? String == "local.zap.app", "the bundle identifier is local.zap.app")
+    check(plist["CFBundleIdentifier"] as? String == "local.tozap.app", "the bundle identifier is local.tozap.app")
+    check(plist["CFBundleName"] as? String == "to.zap" && plist["CFBundleDisplayName"] as? String == "to.zap"
+          && plist["CFBundleExecutable"] as? String == "to.zap", "the product is named to.zap")
+    check(PreferencesMigration.currentDomain == plist["CFBundleIdentifier"] as? String, "preferences migrate into the bundle identifier's domain")
 } else {
     check(false, "Resources/Info.plist is readable")
 }
@@ -287,6 +290,27 @@ check(!PreferencesMigration.migratedKeys.contains("automationURLs") && Preferenc
       && PreferencesMigration.migratedKeys.contains("airPlayReceiverNames"),
       "the real key list moves the settings and never the developer automation switch")
 
+// MARK: One product identity across code, packaging and the Homebrew cask
+
+check(ZAPProject.appBundleName == "to.zap.app" && ZAPProject.homebrewCask == "tozap-remote"
+      && ZAPProject.repository.absoluteString == "https://github.com/skiliz/tozap", "to.zap's bundle, cask and repository")
+if let package = repositoryText("scripts/package.sh"), let release = repositoryText("scripts/release.sh"),
+   let build = repositoryText("scripts/build.sh") {
+    check(build.contains("APP=\"$OUT/to.zap.app\"") && build.contains("Contents/MacOS/to.zap\""), "build.sh makes to.zap.app")
+    check(package.contains("APP=\"build/to.zap.app\"") && package.contains("tozap-$VERSION.zip") && package.contains("tozap-$VERSION.dmg"),
+          "package.sh packages to.zap.app as tozap-<version>.zip/.dmg")
+    check(release.contains("\"local.tozap.app\"") && release.contains("Casks/tozap-remote.rb"), "release.sh checks local.tozap.app and writes the tozap-remote cask")
+} else {
+    check(false, "the build scripts are readable")
+}
+if let cask = repositoryText("../homebrew-tap/templates/tozap-remote-adhoc.rb.in") {
+    check(cask.contains("cask \"tozap-remote\" do") && cask.contains("app \"to.zap.app\"")
+          && cask.contains("https://github.com/skiliz/tozap/releases/download/v#{version}/tozap-#{version}.zip")
+          && cask.contains("~/Library/Application Support/to.zap") && cask.contains("~/Library/Preferences/local.tozap.app.plist"),
+          "the Homebrew cask installs to.zap.app from the tozap release and removes only its own data with --zap")
+}
+check(PairingStore.directory.lastPathComponent == "to.zap", "pairing data lives in Application Support/to.zap")
+
 // MARK: Media buttons say what they send (the Fire TV interface has no previous/next)
 
 check(MediaCommand.allCases == [.playPause, .forward, .rewind], "only Play/Pause, Fast-forward and Rewind exist")
@@ -316,7 +340,7 @@ for bad in ["", "abc", "1.2.3.4", "1..2", "1.2.x", "1.0.0-", "1.0.0-be..ta", "�
     check(SemanticVersion(bad) == nil, "invalid version rejected: \(bad)")
 }
 
-func release(_ tag: String, url: String = "https://github.com/skiliz/zap/releases/tag/v1.1.0",
+func release(_ tag: String, url: String = "https://github.com/skiliz/tozap/releases/tag/v1.1.0",
              prerelease: Bool = false, draft: Bool = false) -> Data {
     let object: [String: Any] = ["tag_name": tag, "html_url": url, "prerelease": prerelease, "draft": draft]
     return try! JSONSerialization.data(withJSONObject: object)
@@ -326,7 +350,7 @@ func evaluate(_ status: Int, _ body: Data = Data(), headers: [String: String] = 
     UpdateChecker.evaluate(statusCode: status, header: { headers[$0] }, body: body,
                            installed: semver(installed), now: Date(timeIntervalSince1970: 1_000))
 }
-let releasePage = URL(string: "https://github.com/skiliz/zap/releases/tag/v1.1.0")!
+let releasePage = URL(string: "https://github.com/skiliz/tozap/releases/tag/v1.1.0")!
 check(evaluate(200, release("v1.0.0")) == .upToDate(installed: semver("1.0.0")), "same version: up to date")
 check(evaluate(200, release("v1.0.0"), installed: "1.2.0") == .upToDate(installed: semver("1.2.0")),
       "an installed build newer than the release is up to date")
@@ -338,12 +362,12 @@ check(evaluate(404) == .noPublicRelease, "no release (or no public repository): 
 check(evaluate(200, release("v1.1.0-beta.1")) == .noPublicRelease, "a prerelease tag is never offered to stable users")
 check(evaluate(200, release("v1.1.0", prerelease: true)) == .noPublicRelease, "a release flagged prerelease is never offered")
 check(evaluate(200, release("v1.1.0", draft: true)) == .noPublicRelease, "a draft is never offered")
-check(evaluate(200, release("v1.1.0", url: "https://evil.example/skiliz/zap/releases/tag/v1.1.0"))
+check(evaluate(200, release("v1.1.0", url: "https://evil.example/skiliz/tozap/releases/tag/v1.1.0"))
       == .updateAvailable(installed: semver("1.0.0"), latest: semver("1.1.0"), releasePage: ZAPProject.releasesPage),
       "a release link off github.com is replaced by ZAP's release list")
-for link in ["http://github.com/skiliz/zap/releases/tag/v1", "https://github.com/other/zap/releases/tag/v1",
-             "https://github.com/skiliz/zap/releases/../../other", "https://user@github.com/skiliz/zap/releases/tag/v1",
-             "https://github.com:444/skiliz/zap/releases/tag/v1", "javascript:alert(1)"] {
+for link in ["http://github.com/skiliz/tozap/releases/tag/v1", "https://github.com/other/zap/releases/tag/v1",
+             "https://github.com/skiliz/tozap/releases/../../other", "https://user@github.com/skiliz/tozap/releases/tag/v1",
+             "https://github.com:444/skiliz/tozap/releases/tag/v1", "javascript:alert(1)"] {
     check(UpdateChecker.releasePage(link) == ZAPProject.releasesPage, "unsafe release link refused: \(link)")
 }
 check(evaluate(403, headers: ["X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "5000"])
@@ -357,14 +381,14 @@ check(evaluate(429, headers: ["Retry-After": "inf"]) == .rateLimited(retryAfter:
 check(evaluate(403) == .serverError(403), "a plain 403 is not mistaken for a rate limit")
 check(evaluate(500) == .serverError(500) && evaluate(301) == .serverError(301), "other statuses are server errors")
 check(evaluate(200, Data("not json".utf8)) == .invalidResponse, "invalid JSON is never a success")
-check(evaluate(200, Data(#"{"html_url":"https://github.com/skiliz/zap/releases"}"#.utf8)) == .invalidResponse,
+check(evaluate(200, Data(#"{"html_url":"https://github.com/skiliz/tozap/releases"}"#.utf8)) == .invalidResponse,
       "a release without a tag is invalid")
 check(evaluate(200, release("latest")) == .invalidResponse, "a tag that isn't a version is invalid")
 check(evaluate(200, Data(count: UpdateChecker.maxResponseBytes + 1)) == .invalidResponse, "oversized answers are refused")
-check(ZAPProject.latestReleaseAPI.absoluteString == "https://api.github.com/repos/skiliz/zap/releases/latest"
-      && ZAPProject.repository.absoluteString == "https://github.com/skiliz/zap",
+check(ZAPProject.latestReleaseAPI.absoluteString == "https://api.github.com/repos/skiliz/tozap/releases/latest"
+      && ZAPProject.repository.absoluteString == "https://github.com/skiliz/tozap",
       "the official repository and its latest-release endpoint")
-check(ZAPProject.homebrewUpgradeCommand == "brew upgrade --cask skiliz/tap/zap-remote", "the Homebrew upgrade command")
+check(ZAPProject.homebrewUpgradeCommand == "brew upgrade --cask skiliz/tap/tozap-remote", "the Homebrew upgrade command")
 let semaphore = DispatchSemaphore(value: 0)
 var unknownVersionResult: UpdateCheckResult?
 Task { unknownVersionResult = await UpdateChecker.check(installedVersion: "—"); semaphore.signal() }
@@ -384,14 +408,14 @@ check(AirPlayReceiverChoice.shown([("Living Room Apple TV", false)], tvPaired: t
 check(AirPlayReceiverChoice.shown(seen, tvPaired: false) == ["Android AirPlay", "Living Room Apple TV"],
       "without a paired TV, every visible receiver is listed")
 
-let caskroom: Set<String> = ["/opt/homebrew/Caskroom/zap-remote"]
-check(InstallationSource.detect(bundlePath: "/Applications/ZAP Remote.app", home: "/Users/u",
+let caskroom: Set<String> = ["/opt/homebrew/Caskroom/tozap-remote"]
+check(InstallationSource.detect(bundlePath: "/Applications/to.zap.app", home: "/Users/u",
                                 fileExists: caskroom.contains) == .homebrew, "Homebrew cask in /Applications")
-check(InstallationSource.detect(bundlePath: "/Users/u/Applications/ZAP Remote.app", home: "/Users/u",
+check(InstallationSource.detect(bundlePath: "/Users/u/Applications/to.zap.app", home: "/Users/u",
                                 fileExists: caskroom.contains) == .homebrew, "Homebrew cask in ~/Applications")
-check(InstallationSource.detect(bundlePath: "/Applications/ZAP Remote.app", home: "/Users/u",
+check(InstallationSource.detect(bundlePath: "/Applications/to.zap.app", home: "/Users/u",
                                 fileExists: { _ in false }) == .unknown, "no Caskroom entry: origin unknown")
-check(InstallationSource.detect(bundlePath: "/Users/u/Downloads/ZAP Remote.app", home: "/Users/u",
+check(InstallationSource.detect(bundlePath: "/Users/u/Downloads/to.zap.app", home: "/Users/u",
                                 fileExists: caskroom.contains) == .unknown, "a copy outside Applications isn't claimed by Homebrew")
 
 // MARK: App IDs from the TV are validated before any use
@@ -400,7 +424,7 @@ check(FireTVApp.isValidAppID("com.netflix.ninja") && FireTVApp.isValidAppID("tv.
 check(!FireTVApp.isValidAppID("../../Pictures/x") && !FireTVApp.isValidAppID("com") && !FireTVApp.isValidAppID("a b.c")
       && !FireTVApp.isValidAppID("com.example/evil"), "paths, spaces and single words refused")
 
-// MARK: Pre-release files move out of the ZAP scanner's folder, leaving its own files alone
+// MARK: Pre-release pairing data moves to "to.zap" (from "ZAP" without touching the scanner's own files)
 
 let moveRoot = FileManager.default.temporaryDirectory.appendingPathComponent("zap-move-\(UUID().uuidString)")
 let scannerFolder = moveRoot.appendingPathComponent("ZAP")
@@ -417,12 +441,32 @@ moved.arguments = ["--migration-probe"]
 moved.environment = ["ZAP_SUPPORT_DIR": moveRoot.path]
 try! moved.run()
 moved.waitUntilExit()
-check(moved.terminationStatus == 0, "pre-release pairing (nickname kept) moves to ZAP Remote")
+check(moved.terminationStatus == 0, "pre-release pairing (nickname kept) moves to to.zap")
 check(!FileManager.default.fileExists(atPath: scannerFolder.appendingPathComponent("device.json").path),
       "the token no longer sits in the scanner's folder")
 check(FileManager.default.fileExists(atPath: scannerFolder.appendingPathComponent("config.xml").path),
       "the scanner's own files are never touched")
 try? FileManager.default.removeItem(at: moveRoot)
+
+// The latest pre-release folder, "ZAP Remote": pairing, app list and icon cache all move; the empty folder goes.
+let remoteRoot = FileManager.default.temporaryDirectory.appendingPathComponent("zap-move-\(UUID().uuidString)")
+let remoteFolder = remoteRoot.appendingPathComponent("ZAP Remote")
+try! FileManager.default.createDirectory(at: remoteFolder.appendingPathComponent("icons-v2"), withIntermediateDirectories: true)
+try! Data(pairedJSON.utf8).write(to: remoteFolder.appendingPathComponent("device.json"))
+try! Data("[]".utf8).write(to: remoteFolder.appendingPathComponent("apps.json"))
+try! Data("png".utf8).write(to: remoteFolder.appendingPathComponent("icons-v2/abc.png"))
+let movedRemote = Process()
+movedRemote.executableURL = URL(fileURLWithPath: CommandLine.arguments[0])
+movedRemote.arguments = ["--migration-probe"]
+movedRemote.environment = ["ZAP_SUPPORT_DIR": remoteRoot.path]
+try! movedRemote.run()
+movedRemote.waitUntilExit()
+let newFolder = remoteRoot.appendingPathComponent("to.zap")
+check(movedRemote.terminationStatus == 0, "the ZAP Remote pairing (nickname kept) moves to to.zap")
+check(FileManager.default.fileExists(atPath: newFolder.appendingPathComponent("icons-v2/abc.png").path),
+      "the icon cache moves with it")
+check(!FileManager.default.fileExists(atPath: remoteFolder.path), "the emptied ZAP Remote folder is removed")
+try? FileManager.default.removeItem(at: remoteRoot)
 
 print("\(passed) passed, \(failures) failed")
 try? FileManager.default.removeItem(at: temp)  // `exit` skips the top-level defer

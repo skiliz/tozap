@@ -1,12 +1,12 @@
 ---
 name: Compatibility report
-about: Tell us how ZAP works with your Fire TV model
+about: Tell us how to.zap works with your Fire TV model
 labels: compatibility
 ---
 
 - Fire TV model and Fire OS version:
 - macOS version and Mac model:
-- ZAP version:
+- to.zap version:
 
 | Feature | Works? | Notes |
 |---|---|---|

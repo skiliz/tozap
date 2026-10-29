@@ -19,5 +19,5 @@ jobs:
         run: scripts/package.sh
       - name: Check the release build has no developer tools
         run: |
-          ! /usr/libexec/PlistBuddy -c "Print :CFBundleURLTypes" "build/ZAP Remote.app/Contents/Info.plist"
-          ! otool -L "build/ZAP Remote.app/Contents/MacOS/ZAP" | grep -q ScreenCaptureKit
+          ! /usr/libexec/PlistBuddy -c "Print :CFBundleURLTypes" "build/to.zap.app/Contents/Info.plist"
+          ! otool -L "build/to.zap.app/Contents/MacOS/to.zap" | grep -q ScreenCaptureKit

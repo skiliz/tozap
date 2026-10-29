@@ -29,7 +29,7 @@ struct MenuBarLabel: View {
         Image(nsImage: MenuBarIcon.image(model.menuBarState))
             .renderingMode(.original)
             .help(description)
-            .accessibilityLabel("ZAP")
+            .accessibilityLabel("to.zap")
             .accessibilityValue(description)
     }
 }

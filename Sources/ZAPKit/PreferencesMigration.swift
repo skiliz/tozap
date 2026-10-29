@@ -9,14 +9,17 @@ public protocol PreferenceStore: AnyObject {
 
 extension UserDefaults: PreferenceStore {}
 
-/// Pre-release builds used the bundle identifier `local.fireremote.app`, so their preferences live in that
-/// defaults domain. Release builds are `local.zap.app`; this moves the known settings across once.
+/// Release builds use the bundle identifier `local.tozap.app`. Pre-release builds used `local.zap.app` and, before
+/// that, `local.fireremote.app`, so their preferences live in those defaults domains; this moves the known settings
+/// across once.
 public enum PreferencesMigration {
-    public static let legacyDomain = "local.fireremote.app"
-    public static let legacyPreviewDomain = "local.fireremote.app.preview"
+    public static let currentDomain = "local.tozap.app"
+    /// Newest first: settings are copied from the first one that has any.
+    public static let legacyDomains = ["local.zap.app", "local.fireremote.app"]
+    public static var legacyPreviewDomains: [String] { legacyDomains.map { $0 + ".preview" } }
     public static let markerKey = "preferencesMigratedFromLegacyDomain"
 
-    /// ZAP's own settings (Settings → General / Voice / Advanced, shortcuts, the TV's AirPlay receiver name).
+    /// The app's own settings (Settings → General / Voice / Advanced, shortcuts, the TV's AirPlay receiver name).
     public static let preferenceKeys = ["quickActions", "showAppIcons", "voiceMode", "allowServerRecognition",
                                         "globalPushToTalk", "showMenuBarIcon", "showNowPlaying", "animationFeedback",
                                         "checkConnectionOnOpen", "airPlayReceiverNames"]

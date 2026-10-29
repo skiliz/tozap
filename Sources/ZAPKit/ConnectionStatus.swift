@@ -92,7 +92,7 @@ public struct MenuBarStatus: Equatable, Sendable {
                 state = "Offline preview — nothing is sent to the TV"
             }
         }
-        var parts = ["\(deviceName ?? "ZAP"): \(state)"]
+        var parts = ["\(deviceName ?? "to.zap"): \(state)"]
         if listening { parts.append("Microphone on") }
         if let mirroringDisplay { parts.append("Screen shared to \(mirroringDisplay)") }
         return MenuBarStatus(link: link, listening: listening, mirroringDisplay: mirroringDisplay,

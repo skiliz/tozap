@@ -1,6 +1,6 @@
-// Generates every ZAP brand asset from one geometry definition: the approved graphite app icon with a slim
+// Generates every to.zap brand asset from one geometry definition: the approved graphite app icon with a slim
 // vertical remote (circular D-pad, select button, microphone button, "…" button) and the monochrome mark.
-//   branding/*.svg (vector sources), branding/zap-app-icon-512.png, Resources/AppIcon.icns
+//   branding/*.svg (vector sources), branding/tozap-app-icon-512.png, Resources/AppIcon.icns
 // The menu bar icon is drawn by the app itself (Sources/ZAP/MenuBarIcon.swift) so it can show states.
 // Run from the repository root:  swift branding/make-assets.swift
 import AppKit
@@ -299,7 +299,7 @@ writeText("""
 <circle cx="512" cy="\(f(sy(Remote.dots.y)))" r="\(f(Remote.buttonRadius))" fill="url(#button)" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="2.5"/>
 <g fill="#E0E0E0"><circle cx="490" cy="\(f(sy(Remote.dots.y)))" r="6.5"/><circle cx="512" cy="\(f(sy(Remote.dots.y)))" r="6.5"/><circle cx="534" cy="\(f(sy(Remote.dots.y)))" r="6.5"/></g>
 </svg>
-""", "branding/zap-app-icon.svg")
+""", "branding/tozap-app-icon.svg")
 
 /// The monochrome mark (same silhouette as the menu bar icon), on a 100 × 100 grid.
 func markSVG(_ color: String, x: CGFloat = 0, y: CGFloat = 0, scale: CGFloat = 1) -> String {
@@ -318,23 +318,7 @@ writeText("""
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
 \(markSVG("#F2F2F0"))
 </svg>
-""", "branding/zap-mark.svg")
-
-func wordmark(_ color: String) -> String {
-    """
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" width="300" height="100">
-    \(markSVG(color, x: 0, y: 10, scale: 0.8))
-    <g fill="none" stroke="\(color)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="104,31 146,31 104,69 146,69"/>
-    <polyline points="168,69 194,31 220,69"/>
-    <line x1="179" y1="55" x2="209" y2="55"/>
-    <path d="M244,69 V31 H266 A15,15 0 0 1 266,61 H244"/>
-    </g>
-    </svg>
-    """
-}
-writeText(wordmark("#F2F2F0"), "branding/zap-wordmark-on-dark.svg")
-writeText(wordmark("#15161B"), "branding/zap-wordmark-on-light.svg")
+""", "branding/tozap-mark.svg")
 
 // MARK: App icon (.icns) and a 512 px preview
 
@@ -352,5 +336,5 @@ try! iconutil.run()
 iconutil.waitUntilExit()
 precondition(iconutil.terminationStatus == 0, "iconutil failed")
 print("wrote Resources/AppIcon.icns")
-try! appIcon(512).write(to: root.appendingPathComponent("branding/zap-app-icon-512.png"))
-print("wrote branding/zap-app-icon-512.png")
+try! appIcon(512).write(to: root.appendingPathComponent("branding/tozap-app-icon-512.png"))
+print("wrote branding/tozap-app-icon-512.png")

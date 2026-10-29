@@ -174,11 +174,11 @@ enum StandardMenus {
         let main = NSApp.mainMenu ?? NSMenu()
         if NSApp.mainMenu == nil { NSApp.mainMenu = main }
         if main.items.first(where: { $0.submenu?.items.contains { $0.keyEquivalent == "q" } == true }) == nil {
-            let app = NSMenu(title: "ZAP")
+            let app = NSMenu(title: "to.zap")
             app.addItem(withTitle: "Settings…", action: #selector(NSApplication.zapShowSettings(_:)), keyEquivalent: ",")
             app.addItem(.separator())
-            app.addItem(withTitle: "Quit ZAP", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
-            let item = NSMenuItem(title: "ZAP", action: nil, keyEquivalent: "")
+            app.addItem(withTitle: "Quit to.zap", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+            let item = NSMenuItem(title: "to.zap", action: nil, keyEquivalent: "")
             item.submenu = app
             main.insertItem(item, at: 0)
         }

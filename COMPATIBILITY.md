@@ -10,7 +10,7 @@
 
 ## Fire TV
 
-ZAP has two parts with different requirements:
+to.zap has two parts with different requirements:
 
 - **Remote control** uses the local network interface of Amazon's Fire TV mobile app (discovery, PIN
   pairing, keys, app launching). It needs nothing installed on the TV.
@@ -18,11 +18,11 @@ ZAP has two parts with different requirements:
   [docs/MIRRORING.md](docs/MIRRORING.md)). A TV can work as a remote target and still be unable to install
   the receiver.
 
-Only one device has been tested with ZAP. Everything else below is what public evidence suggests, not a
+Only one device has been tested with to.zap. Everything else below is what public evidence suggests, not a
 promise.
 
-**Legend:** **Tested**: tested and confirmed with ZAP · **Documented**: reported working by public sources,
-not tested with ZAP · **Expected**: inferred from the platform or the receiver's requirements, not tested ·
+**Legend:** **Tested**: tested and confirmed with to.zap · **Documented**: reported working by public sources,
+not tested with to.zap · **Expected**: inferred from the platform or the receiver's requirements, not tested ·
 **Unknown** · **Unsupported**
 
 | Device (model code, year) | Operating system | Remote control | Mirroring helper |
@@ -52,11 +52,11 @@ last row. Reports from other devices are welcome: please open a compatibility re
 | Now Playing (title, episode, artwork, playback state) | **Not available**: Fire TV doesn't expose it to remote apps, see [docs/NOW_PLAYING.md](docs/NOW_PLAYING.md) |
 | Voice — Apple Speech, Italian, on-device | Verified |
 | Voice — relay to Alexa | Verified (Alexa answered) |
-| Screen Mirroring helper | Verified with AirPlay Server: mirror and extended display worked, the menu bar indicator followed the session, and mirroring continued after ZAP quit |
+| Screen Mirroring helper | Verified with AirPlay Server: mirror and extended display worked, the menu bar indicator followed the session, and mirroring continued after to.zap quit |
 | Volume, mute, power | **Not available**: the TV accepts the volume requests but treats them as arrow keys |
 | Typing text into apps | Not supported (the TV dropped text sent this way) |
 
-The Fire TV interface ZAP uses isn't documented by Amazon, so a Fire OS or Fire TV app update could change it.
+The Fire TV interface to.zap uses isn't documented by Amazon, so a Fire OS or Fire TV app update could change it.
 
 ## Network
 
@@ -65,7 +65,7 @@ The Fire TV interface ZAP uses isn't documented by Amazon, so a Fire OS or Fire 
 - Phone hotspots and guest networks often isolate their clients; on an iPhone Personal Hotspot the Mac could
   not reach the TV at all. A home router, or macOS Internet Sharing with the TV joined to the Mac, works.
 - A VPN running on the TV can break the connection.
-- macOS may ask for **Local Network** access. If it's denied, ZAP says so and points to System Settings →
+- macOS may ask for **Local Network** access. If it's denied, to.zap says so and points to System Settings →
   Privacy & Security → Local Network.
 
 ## Screen Mirroring receivers
@@ -74,8 +74,8 @@ Fire TV has no AirPlay receiver of its own; its "Display Mirroring" is Miracast,
 
 | Receiver | Cost | Notes |
 |---|---|---|
-| [AirPlay Server](https://github.com/jqssun/android-airplay-server) | Free, open source (GPL-3.0) | Tested with ZAP, and the only receiver ZAP opens. Distributed through F-Droid and GitHub, not the Amazon Appstore. Shows up as "Android AirPlay". |
-| Other receivers (for example AirScreen in the Amazon Appstore) | Varies | Not tested with ZAP. ZAP can use one only if it is already running. Don't run two receivers at once: they compete for the AirPlay port. |
+| [AirPlay Server](https://github.com/jqssun/android-airplay-server) | Free, open source (GPL-3.0) | Tested with to.zap, and the only receiver to.zap opens. Distributed through F-Droid and GitHub, not the Amazon Appstore. Shows up as "Android AirPlay". |
+| Other receivers (for example AirScreen in the Amazon Appstore) | Varies | Not tested with to.zap. to.zap can use one only if it is already running. Don't run two receivers at once: they compete for the AirPlay port. |
 
 Protected video (DRM) shows black when mirrored. Latency and audio quality depend on the receiver and the
 network and were not measured.

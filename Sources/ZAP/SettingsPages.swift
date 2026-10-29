@@ -44,9 +44,9 @@ struct GeneralSettingsPage: View {
     var body: some View {
         let prefs = AppPreferences.shared
         let _ = navigation.refreshTick  // re-read the login item when the window becomes key
-        SettingsPage(title: "General", subtitle: "Startup, the menu bar, and how ZAP looks and moves.") {
+        SettingsPage(title: "General", subtitle: "Startup, the menu bar, and how to.zap looks and moves.") {
             SettingsToggleRow(title: "Launch at login",
-                              subtitle: "Open ZAP automatically when you log in to this Mac.",
+                              subtitle: "Open to.zap automatically when you log in to this Mac.",
                               note: loginNote(prefs), noteIsWarning: prefs.loginItemError != nil,
                               isOn: binding({ prefs.launchAtLogin }, { prefs.setLaunchAtLogin($0) }),
                               enabled: !RemoteModel.offlinePreview)
@@ -59,19 +59,19 @@ struct GeneralSettingsPage: View {
             }
             SettingsDivider()
             SettingsToggleRow(title: "Show menu bar icon",
-                              subtitle: "The remote opens from this icon. If you hide it, open ZAP again from Applications or Spotlight to come back to Settings.",
+                              subtitle: "The remote opens from this icon. If you hide it, open to.zap again from Applications or Spotlight to come back to Settings.",
                               isOn: binding({ prefs.showMenuBarIcon }, { show in
                                   if show { prefs.showMenuBarIcon = true } else { navigation.confirmingHideMenuBarIcon = true }
                               }))
             SettingsDivider()
-            SettingsValueRow(title: "Appearance", subtitle: "ZAP uses its dark graphite design in every macOS appearance.") {
+            SettingsValueRow(title: "Appearance", subtitle: "to.zap uses its dark graphite design in every macOS appearance.") {
                 Text("Dark").font(.system(size: 13)).foregroundStyle(DS.Palette.textSecondary)
             }
             SettingsDivider()
             SettingsToggleRow(title: "Show Now Playing",
                               subtitle: "Show the app and title playing on your TV in the status capsule, when the TV reports them.",
                               note: NowPlayingPolicy.isAvailable ? nil
-                                  : "Not available yet: no Fire TV source has been verified. ZAP never shows a guessed title.",
+                                  : "Not available yet: no Fire TV source has been verified. to.zap never shows a guessed title.",
                               isOn: binding({ NowPlayingPolicy.isAvailable && prefs.showNowPlaying }, { prefs.showNowPlaying = $0 }),
                               enabled: NowPlayingPolicy.isAvailable)
             SettingsDivider()
@@ -82,7 +82,7 @@ struct GeneralSettingsPage: View {
             SettingsDivider()
             HStack {
                 Spacer()
-                Button("Quit ZAP") { NSApplication.shared.terminate(nil) }
+                Button("Quit to.zap") { NSApplication.shared.terminate(nil) }
             }
             .padding(.top, 18)
         }
@@ -91,7 +91,7 @@ struct GeneralSettingsPage: View {
             Button("Hide Icon") { prefs.showMenuBarIcon = false }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("The remote opens from the menu bar icon. To come back to Settings, open ZAP again from Applications or Spotlight.")
+            Text("The remote opens from the menu bar icon. To come back to Settings, open to.zap again from Applications or Spotlight.")
         }
     }
 
@@ -146,7 +146,7 @@ struct DeviceSettingsPage: View {
             Button("Save") { model.setNickname(navigation.renameText) }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("The name is used in ZAP on this Mac only. Leave it empty to use the TV's own name.")
+            Text("The name is used in to.zap on this Mac only. Leave it empty to use the TV's own name.")
         }
         .alert("Pair again with this TV?", isPresented: binding({ navigation.confirmingPairAgain }, { navigation.confirmingPairAgain = $0 })) {
             Button("Continue") {
@@ -155,13 +155,13 @@ struct DeviceSettingsPage: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("The TV will show a PIN. ZAP keeps the current pairing until the new one succeeds.")
+            Text("The TV will show a PIN. to.zap keeps the current pairing until the new one succeeds.")
         }
         .alert("Forget “\(model.title)”?", isPresented: binding({ navigation.confirmingForget }, { navigation.confirmingForget = $0 })) {
             Button("Forget", role: .destructive) { model.forgetDevice() }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("ZAP removes the pairing and the saved app list from this Mac. To use this TV again, you'll need the PIN shown on the TV.")
+            Text("to.zap removes the pairing and the saved app list from this Mac. To use this TV again, you'll need the PIN shown on the TV.")
         }
         .sheet(isPresented: binding({ model.page == .pairing && navigation.pairingSession == model.pairingSession }, { shown in
             // Closed by the user (Esc): end the flow. Success or a cancel elsewhere already ended it.
@@ -206,7 +206,7 @@ private struct DeviceCard: View {
                     navigation.renaming = true
                 }
                 .disabled(RemoteModel.offlinePreview)
-                .help("Change the name ZAP shows for this TV")
+                .help("Change the name to.zap shows for this TV")
             }
             .padding(16)
         }
@@ -368,7 +368,7 @@ struct AppsSettingsPage: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Your shortcuts are replaced by Netflix, Prime Video and Spotify, matched to the apps on your TV when ZAP knows its app list.")
+            Text("Your shortcuts are replaced by Netflix, Prime Video and Spotify, matched to the apps on your TV when to.zap knows its app list.")
         }
     }
 }
@@ -391,7 +391,7 @@ private struct AppShortcutRow: View {
                 if missing {
                     Text("Not on this TV").font(.system(size: 11.5)).foregroundStyle(DS.Palette.warning)
                 } else if item.appId == nil {
-                    Text("Matched when ZAP reads your TV's app list")
+                    Text("Matched when to.zap reads your TV's app list")
                         .font(.system(size: 11.5)).foregroundStyle(DS.Palette.textTertiary)
                 }
             }
@@ -490,13 +490,13 @@ private struct AppChooserSheet: View {
                 .font(.system(size: 15, weight: .semibold))
                 .accessibilityAddTraits(.isHeader)
             Text(model.appsFromTV ? "Apps installed on \(model.title)."
-                 : "From the app list ZAP saved from \(model.title). Refresh to read it from the TV again.")
+                 : "From the app list to.zap saved from \(model.title). Refresh to read it from the TV again.")
                 .font(.system(size: 12))
                 .foregroundStyle(DS.Palette.textSecondary)
             TextField("Search apps", text: binding({ navigation.appSearch }, { navigation.appSearch = $0 }))
                 .textFieldStyle(.roundedBorder)
             if model.apps.isEmpty {
-                Text("ZAP hasn't read your TV's app list yet. Refresh to read it — the TV must be on and on this network.")
+                Text("to.zap hasn't read your TV's app list yet. Refresh to read it — the TV must be on and on this network.")
                     .font(.system(size: 12))
                     .foregroundStyle(DS.Palette.textSecondary)
                     .frame(maxWidth: .infinity, minHeight: 120)
@@ -568,7 +568,7 @@ struct VoiceSettingsPage: View {
     var body: some View {
         let voice = model.voice
         let _ = navigation.refreshTick  // permissions are re-read when the window becomes key
-        SettingsPage(title: "Voice", subtitle: "How ZAP understands what you say. The microphone is on only while you hold push-to-talk.") {
+        SettingsPage(title: "Voice", subtitle: "How to.zap understands what you say. The microphone is on only while you hold push-to-talk.") {
             VStack(alignment: .leading, spacing: 6) {
                 VoiceModeOption(voice: voice, mode: .local, title: "Apple Speech on this Mac (Italian)",
                                 subtitle: localSubtitle(voice))
@@ -594,11 +594,11 @@ struct VoiceSettingsPage: View {
                               enabled: !RemoteModel.offlinePreview)
             SettingsDivider()
             PermissionRow(title: "Microphone", permission: voice.microphonePermission,
-                          subtitle: "Needed in both modes. ZAP asks the first time you hold the mic.")
+                          subtitle: "Needed in both modes. to.zap asks the first time you hold the mic.")
             if voice.mode == .local {
                 SettingsDivider()
                 PermissionRow(title: "Speech Recognition", permission: voice.speechPermission,
-                              subtitle: "Needed for Apple Speech. ZAP asks the first time you use it.")
+                              subtitle: "Needed for Apple Speech. to.zap asks the first time you use it.")
             }
             HStack {
                 Spacer()
@@ -615,7 +615,7 @@ struct VoiceSettingsPage: View {
     private func localSubtitle(_ voice: VoiceController) -> String {
         let base = "Commands like “Apri Netflix” or “Vai a destra”, recognized by Apple Speech."
         return voice.onDeviceItalian
-            ? base + " This Mac supports on-device Italian recognition, and ZAP requires it."
+            ? base + " This Mac supports on-device Italian recognition, and to.zap requires it."
             : base + " On-device Italian isn't available on this Mac."
     }
 }
@@ -707,16 +707,16 @@ struct AdvancedSettingsPage: View {
             .frame(minHeight: DS.Settings.rowMinHeight)
             SettingsDivider()
             SettingsToggleRow(title: "Check connection automatically",
-                              subtitle: "A quick read-only check when you open the remote. ZAP never checks in the background.",
+                              subtitle: "A quick read-only check when you open the remote. to.zap never checks in the background.",
                               isOn: binding({ prefs.checkConnectionOnOpen }, { prefs.checkConnectionOnOpen = $0 }))
             SettingsDivider()
             SettingsToggleRow(title: "Show app icons",
-                              subtitle: "On by default. Downloads the icons your TV lists from Amazon's image servers (m.media-amazon.com, images-na.ssl-images-amazon.com), which see your IP address. Off keeps ZAP's traffic on your local network.",
+                              subtitle: "On by default. Downloads the icons your TV lists from Amazon's image servers (m.media-amazon.com, images-na.ssl-images-amazon.com), which see your IP address. Off keeps to.zap's traffic on your local network.",
                               isOn: binding({ icons.enabled }, { enabled in
                                   icons.enabled = enabled
                                   if enabled { icons.prefetch(model.apps) }
                               }))
-            SettingsValueRow(title: "Downloaded icons", subtitle: "Kept in ZAP's folder on this Mac.") {
+            SettingsValueRow(title: "Downloaded icons", subtitle: "Kept in to.zap's folder on this Mac.") {
                 Button("Remove") { icons.clearCache() }
                     .disabled(RemoteModel.offlinePreview)
             }
@@ -725,7 +725,7 @@ struct AdvancedSettingsPage: View {
                 .padding(.vertical, 12)
             SettingsDivider()
             SettingsValueRow(title: "Diagnostics",
-                             subtitle: "Copies the ZAP and macOS versions, the connection state and your voice, icon, shortcut, login and menu bar settings — no names, addresses or tokens — for a bug report.") {
+                             subtitle: "Copies the to.zap and macOS versions, the connection state and your voice, icon, shortcut, login and menu bar settings — no names, addresses or tokens — for a bug report.") {
                 Button(navigation.diagnosticsCopied ? "Copied" : "Copy Summary") { copyDiagnostics() }
             }
         }
@@ -737,7 +737,7 @@ struct AdvancedSettingsPage: View {
         let voice = model.voice
         let shortcuts = model.quickActions
         var lines = [
-            "ZAP \(info?["CFBundleShortVersionString"] as? String ?? "?") (\(info?["CFBundleVersion"] as? String ?? "?"))",
+            "to.zap \(info?["CFBundleShortVersionString"] as? String ?? "?") (\(info?["CFBundleVersion"] as? String ?? "?"))",
             "macOS \(ProcessInfo.processInfo.operatingSystemVersionString)",
             "Paired: \(model.isPaired ? "yes" : "no") · Connection: \(model.connection.label)",
             "Voice: \(voice.mode == .local ? "Apple Speech" : "Alexa") · on-device Italian: \(voice.onDeviceItalian ? "yes" : "no") · push-to-talk anywhere: \(model.globalShortcutEnabled ? "on" : "off")",
@@ -857,16 +857,16 @@ private struct AboutIdentity: View {
                 .frame(width: 112, height: 112)
                 .shadow(color: .black.opacity(0.4), radius: 16, y: 8)
                 .accessibilityHidden(true)
-            // The wordmark keeps the approved logo's wide spacing; tracking also follows the last letter,
-            // so the same amount of leading padding re-centres the word.
-            Text("ZAP")
+            // Light weight and gradient as approved; lowercase "to.zap" takes only slight tracking. Tracking also
+            // follows the last letter, so the same leading padding re-centres the word.
+            Text("to.zap")
                 .font(.system(size: 34, weight: .light))
-                .tracking(8)
-                .padding(.leading, 8)
+                .tracking(1.5)
+                .padding(.leading, 1.5)
                 .foregroundStyle(LinearGradient(colors: [Color(white: 0.98), Color(white: 0.76)],
                                                 startPoint: .top, endPoint: .bottom))
                 .padding(.top, 18)
-                .accessibilityLabel("ZAP")
+                .accessibilityLabel("to.zap")
                 .accessibilityAddTraits(.isHeader)
             Text("Version \(version)")
                 .font(.system(size: 12).monospacedDigit())
@@ -901,7 +901,7 @@ private struct AboutActions: View {
         SettingsGroup {
             AboutActionRow(symbol: "chevron.left.forwardslash.chevron.right", title: "GitHub Repository",
                            accessory: .symbol("arrow.up.right"),
-                           hint: "Opens ZAP's source code on GitHub in your browser.") {
+                           hint: "Opens to.zap's source code on GitHub in your browser.") {
                 NSWorkspace.shared.open(ZAPProject.repository)
             }
             SettingsDivider().padding(.leading, 46)
@@ -909,7 +909,7 @@ private struct AboutActions: View {
                            accessory: updateAccessory,
                            hint: RemoteModel.offlinePreview
                                ? "Unavailable in the offline preview."
-                               : "Asks GitHub once for ZAP's latest release. Nothing is downloaded or installed.") {
+                               : "Asks GitHub once for to.zap's latest release. Nothing is downloaded or installed.") {
                 navigation.checkForUpdates()
             }
             .disabled(navigation.checkingForUpdates || RemoteModel.offlinePreview)
@@ -1034,25 +1034,25 @@ enum UpdateMessage {
 
     static func title(_ result: UpdateCheckResult) -> String {
         switch result {
-        case .upToDate: return "ZAP is up to date."
-        case .updateAvailable(_, let latest, _): return "ZAP \(latest) is available."
+        case .upToDate: return "to.zap is up to date."
+        case .updateAvailable(_, let latest, _): return "to.zap \(latest) is available."
         case .noPublicRelease: return "There's no public release yet."
-        case .rateLimited: return "ZAP can't check for updates right now."
-        default: return "ZAP couldn't check for updates."
+        case .rateLimited: return "to.zap can't check for updates right now."
+        default: return "to.zap couldn't check for updates."
         }
     }
 
     static func message(_ result: UpdateCheckResult) -> String {
         switch result {
         case .upToDate(let installed):
-            return "No newer version is available. You have ZAP \(installed)."
+            return "No newer version is available. You have to.zap \(installed)."
         case .updateAvailable(let installed, _, _):
             if installation == .homebrew {
-                return "You have version \(installed). ZAP was installed with Homebrew, so update it in Terminal:\n\n\(ZAPProject.homebrewUpgradeCommand)"
+                return "You have version \(installed). to.zap was installed with Homebrew, so update it in Terminal:\n\n\(ZAPProject.homebrewUpgradeCommand)"
             }
             return "You have version \(installed). Download the new version from its release page on GitHub."
         case .noPublicRelease:
-            return "ZAP hasn't published a stable release on GitHub yet."
+            return "to.zap hasn't published a stable release on GitHub yet."
         case .networkUnavailable:
             return "GitHub couldn't be reached. Check your internet connection and try again."
         case .rateLimited(let retryAfter):
@@ -1061,11 +1061,11 @@ enum UpdateMessage {
             }
             return "GitHub is limiting requests from your network. Try again after \(retryAfter.formatted(date: .omitted, time: .shortened))."
         case .invalidResponse:
-            return "ZAP couldn't read GitHub's response. You can check the releases page instead."
+            return "to.zap couldn't read GitHub's response. You can check the releases page instead."
         case .serverError(let code):
             return "GitHub answered with an error (HTTP \(code)). Try again later."
         case .unknownInstalledVersion:
-            return "This copy of ZAP has no readable version number."
+            return "This copy of to.zap has no readable version number."
         }
     }
 }

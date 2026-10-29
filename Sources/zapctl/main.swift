@@ -21,7 +21,7 @@ func ms(since start: Date) -> String { String(format: "%4.0f ms", Date().timeInt
 
 func client() -> FireTVClient {
     PairingStore.migrateLegacyStoreIfNeeded()
-    guard let device = PairingStore.load() else { fail("not paired: pair in the ZAP app first") }
+    guard let device = PairingStore.load() else { fail("not paired: pair in the to.zap app first") }
     return FireTVClient(device: device)
 }
 

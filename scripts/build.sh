@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Builds "build/ZAP Remote.app", the developer CLI (build/zapctl) and the test runner.
+# Builds "build/to.zap.app", the developer CLI (build/zapctl) and the test runner.
 #   scripts/build.sh          build
 #   scripts/build.sh test     build and run the tests
 #   ZAP_DEVTOOLS=1 scripts/build.sh   developer build: adds the offline preview, the menu bar demo and the
@@ -12,7 +12,7 @@ SDK=$(xcrun --show-sdk-path)
 FLAGS=(-O -swift-version 5 -target arm64-apple-macos14.0 -sdk "$SDK")
 OUT=${ZAP_BUILD_DIR:-build}  # developer builds can go elsewhere, e.g. ZAP_BUILD_DIR=build-dev
 OBJ=$OUT/obj
-APP="$OUT/ZAP Remote.app"
+APP="$OUT/to.zap.app"
 mkdir -p $OBJ
 
 echo "• ZAPKit"
@@ -28,18 +28,18 @@ fi
 echo "• zapctl"
 swiftc $FLAGS -I $OBJ -L $OBJ -lZAPKit Sources/zapctl/main.swift -o $OUT/zapctl
 
-echo "• ZAP Remote.app${ZAP_DEVTOOLS:+ (developer tools)}"
+echo "• to.zap.app${ZAP_DEVTOOLS:+ (developer tools)}"
 APP_FLAGS=()
 [[ -n "${ZAP_DEVTOOLS:-}" ]] && APP_FLAGS=(-D ZAP_DEVTOOLS)
 swiftc $FLAGS $APP_FLAGS -parse-as-library -I $OBJ -L $OBJ -lZAPKit Sources/ZAP/*.swift -o $OBJ/ZAP
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp $OBJ/ZAP "$APP/Contents/MacOS/ZAP"
+cp $OBJ/ZAP "$APP/Contents/MacOS/to.zap"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 if [[ -n "${ZAP_DEVTOOLS:-}" ]]; then  # the automation URL scheme exists only in developer builds
   /usr/libexec/PlistBuddy -c "Add :CFBundleURLTypes array" -c "Add :CFBundleURLTypes:0 dict" \
-    -c "Add :CFBundleURLTypes:0:CFBundleURLName string local.zap.app.automation" \
+    -c "Add :CFBundleURLTypes:0:CFBundleURLName string local.tozap.app.automation" \
     -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes array" -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes:0 string zapremote" \
     "$APP/Contents/Info.plist"
 fi
@@ -61,4 +61,4 @@ codesign --verify --strict "$APP"
 for file in LICENSE THIRD_PARTY_NOTICES.md; do  # MIT: the license travels with every copy of the app
   [[ -f "$APP/Contents/Resources/$file" ]] || { echo "missing $file in the bundle"; exit 1; }
 done
-echo "built: $PWD/$APP ($(lipo -archs "$APP/Contents/MacOS/ZAP"))"
+echo "built: $PWD/$APP ($(lipo -archs "$APP/Contents/MacOS/to.zap"))"

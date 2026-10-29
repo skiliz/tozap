@@ -10,7 +10,7 @@ import os
 /// Reachable only through the hidden automation URLs.
 @MainActor
 enum PanelCapture {
-    private static let log = Logger(subsystem: "local.zap.app", category: "capture")
+    private static let log = Logger(subsystem: "local.tozap.app", category: "capture")
 
     private static var preview: NSPanel?
 

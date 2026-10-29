@@ -11,7 +11,7 @@ import os
 final class RemoteModel {
     static let shared = RemoteModel()
 
-    /// Looking at the UI without touching anything: `open -n "build/ZAP Remote.app" --args -ZAPOfflinePreview YES`.
+    /// Looking at the UI without touching anything: `open -n "build/to.zap Remote.app" --args -ZAPOfflinePreview YES`.
     /// No client is created; nothing is discovered, sent or downloaded; the microphone and the login item
     /// are left alone, and the pairing is read but never changed. (A launch argument, not a stored setting.)
     static let offlinePreview = AppDefaults.isOfflinePreview
@@ -97,7 +97,7 @@ final class RemoteModel {
     let mirroring = MirroringCoordinator()
     let quickActions = QuickActionsStore()
 
-    var title: String { device?.displayName ?? "ZAP" }
+    var title: String { device?.displayName ?? "to.zap" }
     var isPaired: Bool { device != nil }
 
     /// The latest playback report and its provenance. No source fills it yet: retrieving metadata from the
@@ -224,7 +224,7 @@ final class RemoteModel {
     @ObservationIgnored private var panelOpen = false
     @ObservationIgnored private let hotKey = PushToTalkHotKey()
     @ObservationIgnored private(set) var automationEnabled = false
-    @ObservationIgnored private let log = Logger(subsystem: "local.zap.app", category: "app")
+    @ObservationIgnored private let log = Logger(subsystem: "local.tozap.app", category: "app")
 
     private enum Op {
         case action(RemoteAction)
@@ -243,7 +243,7 @@ final class RemoteModel {
     func start() {
         // ZAP's windows are dark on their own (Settings window, remote panel), so the menu bar icon still
         // follows the real menu bar appearance.
-        // Hidden developer switch: `defaults write local.zap.app automationURLs -bool true`
+        // Hidden developer switch: `defaults write local.tozap.app automationURLs -bool true`
 #if ZAP_DEVTOOLS
         automationEnabled = UserDefaults.standard.bool(forKey: "automationURLs") && !Self.offlinePreview
 #endif
@@ -735,7 +735,7 @@ final class RemoteModel {
     }
 
     static let localNetworkHint =
-        "ZAP can't see your network: allow ZAP in System Settings → Privacy & Security → Local Network."
+        "to.zap can't see your network: allow to.zap in System Settings → Privacy & Security → Local Network."
 
     func requestPIN() async {
         guard !Self.offlinePreview else {
@@ -766,7 +766,7 @@ final class RemoteModel {
         let candidate = FireTVClient(host: host, token: nil, pinnedRoot: nil)
         pairingClient = candidate
         do {
-            try await candidate.requestPIN(clientName: "ZAP for Mac")
+            try await candidate.requestPIN(clientName: "to.zap for Mac")
             guard session == pairingSession else { return }  // cancelled while the TV answered
             awaitingPIN = true
             pairingNotice("Enter the PIN shown on the TV.", error: false, for: 30)
@@ -785,7 +785,7 @@ final class RemoteModel {
             let (token, root) = try await candidate.verifyPIN(pairingPIN.filter(\.isNumber))
             var paired = PairedDevice(host: candidate.host, token: token, rootCertificate: root,
                                       deviceName: pairingTV?.name, deviceID: pairingTV?.deviceID,
-                                      clientName: "ZAP for Mac", pairedAt: Date())
+                                      clientName: "to.zap for Mac", pairedAt: Date())
             let verified = FireTVClient(device: paired)
             let properties = (try? await verified.properties()) ?? [:]
             paired.serial = properties["dsn"]
@@ -957,7 +957,7 @@ final class RemoteModel {
 
     /// `zapremote://key/<name>`, `media/<playPause|forward|rewind>`, `launch/<appId from the TV's list>`,
     /// `maxplayer`, `mirroring`, `ptt?seconds=3`, `voice-test?file=…&dry=1`, `ui?page=…&apps=1&nickname=…`,
-    /// `snapshot?path=…`. Enabled only with `defaults write local.zap.app automationURLs -bool true`.
+    /// `snapshot?path=…`. Enabled only with `defaults write local.tozap.app automationURLs -bool true`.
     func handleURL(_ url: URL) {
         guard url.scheme == "zapremote" else { return }
         guard automationEnabled else {

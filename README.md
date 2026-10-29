@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="branding/zap-app-icon-512.png" alt="ZAP app icon: a slim graphite remote" width="128">
+  <img src="branding/tozap-app-icon-512.png" alt="to.zap app icon: a slim graphite remote" width="128">
 </p>
 
-<h1 align="center">ZAP</h1>
+<h1 align="center">to.zap</h1>
 
 <p align="center"><strong>Your TV. One click away.</strong></p>
 
@@ -12,10 +12,10 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/remote.png" alt="The ZAP remote, opened from the menu bar" width="320">
+  <img src="docs/screenshots/remote.png" alt="The to.zap remote, opened from the menu bar" width="320">
 </p>
 
-> **Status:** version 1.0.0 is being prepared. Until its release is published on GitHub, ZAP is available as
+> **Status:** version 1.0.0 is being prepared. Until its release is published on GitHub, to.zap is available as
 > source code. Releases are free and open source, and **not signed with an Apple Developer ID or notarized by
 > Apple**: see [Install](#install).
 
@@ -35,33 +35,33 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
   - up to four shortcuts, chosen from the apps actually installed on your TV;
   - reorder, hide or replace them in Settings → Apps;
   - keys 1–4 open them.
-- **Pairing that stays put:** ZAP finds Fire TVs on your network and pairs with the PIN shown on the TV. It
+- **Pairing that stays put:** to.zap finds Fire TVs on your network and pairs with the PIN shown on the TV. It
   finds the TV again when it gets a new address.
 - **Voice, two ways:** hold to talk.
   - Italian commands are recognised on your Mac with Apple Speech ("Apri Netflix", "Vai a destra",
     "Conferma"…).
   - Or speak to Alexa through your Fire TV.
-- **A Screen Mirroring helper:** ZAP opens the AirPlay receiver app on your TV and points you to macOS Screen
-  Mirroring. macOS and the receiver do the streaming; ZAP never handles video.
+- **A Screen Mirroring helper:** to.zap opens the AirPlay receiver app on your TV and points you to macOS Screen
+  Mirroring. macOS and the receiver do the streaming; to.zap never handles video.
 - **Check for Updates** in Settings → About, only when you click it.
 - **A native Settings window:** General, Device, Apps, Voice, Advanced and About.
 - **Local-first:** no account, no analytics, no telemetry, no server of ours.
 
 <p align="center">
-  <img src="docs/screenshots/settings-general.png" alt="ZAP Settings, General section" width="640">
+  <img src="docs/screenshots/settings-general.png" alt="to.zap Settings, General section" width="640">
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/settings-about.png" alt="ZAP Settings, About section" width="480">
+  <img src="docs/screenshots/settings-about.png" alt="to.zap Settings, About section" width="480">
 </p>
 
-## What ZAP can't do
+## What to.zap can't do
 
 - **Now Playing.** Fire TV doesn't tell remote apps the playing title, episode, artwork, progress or
-  playback state, so ZAP never shows or guesses them. The investigation is in
+  playback state, so to.zap never shows or guesses them. The investigation is in
   [docs/NOW_PLAYING.md](docs/NOW_PLAYING.md).
 - **Previous / next episode, track or channel.** Fire TV's remote interface has no such command (tested,
-  see [docs/PROTOCOL.md](docs/PROTOCOL.md)), so ZAP offers Rewind and Fast-forward instead of pretending.
+  see [docs/PROTOCOL.md](docs/PROTOCOL.md)), so to.zap offers Rewind and Fast-forward instead of pretending.
 - **Volume and power.** They can't be controlled over the network on the verified device.
 - **Channel switching and TV guides.** Not supported.
 - **Mirroring on its own.** Screen Mirroring needs an AirPlay receiver app on the TV, and protected (DRM)
@@ -77,27 +77,27 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
 
 ### Download
 
-When version 1.0.0 is published, download `ZAP-1.0.0.zip` (or the `.dmg`) from the
-[Releases](https://github.com/skiliz/zap/releases) page, check it against `SHA256SUMS.txt` if you like
-(`shasum -a 256 ZAP-1.0.0.zip`), and move **ZAP Remote** to Applications.
+When version 1.0.0 is published, download `tozap-1.0.0.zip` (or the `.dmg`) from the
+[Releases](https://github.com/skiliz/tozap/releases) page, check it against `SHA256SUMS.txt` if you like
+(`shasum -a 256 tozap-1.0.0.zip`), and move **to.zap** to Applications.
 
 ### Homebrew
 
 ```sh
-brew install --cask skiliz/tap/zap-remote
+brew install --cask skiliz/tap/tozap-remote
 ```
 
 Available once the first release is published.
 
 ### The first launch: approving an app that isn't notarized
 
-ZAP is distributed without a paid Apple Developer account, so it is **not signed with a Developer ID and not
-notarized by Apple** — Apple hasn't checked it. macOS therefore says it can't verify ZAP the first time you
+to.zap is distributed without a paid Apple Developer account, so it is **not signed with a Developer ID and not
+notarized by Apple** — Apple hasn't checked it. macOS therefore says it can't verify to.zap the first time you
 open it. If you downloaded it from this repository's releases or installed it with the Homebrew tap above:
 
-1. Open **ZAP Remote** from Applications, and click **Done** in the warning (**Cancel** on macOS 14).
+1. Open **to.zap** from Applications, and click **Done** in the warning (**Cancel** on macOS 14).
 2. Within about an hour, open **System Settings → Privacy & Security**, scroll to **Security**, click
-   **Open Anyway** next to the message about ZAP Remote, and enter your login password.
+   **Open Anyway** next to the message about to.zap, and enter your login password.
 3. Click **Open** to confirm.
 
 On macOS 14 Sonoma you can instead Control-click the app in Finder and choose **Open**. You never need to turn
@@ -108,28 +108,28 @@ access. If you'd rather not trust a prebuilt app, build it yourself:
 ### Build from source
 
 ```sh
-git clone https://github.com/skiliz/zap.git
-cd zap
-scripts/build.sh test           # builds "build/ZAP Remote.app" and runs the tests
-open "build/ZAP Remote.app"
+git clone https://github.com/skiliz/tozap.git
+cd tozap
+scripts/build.sh test           # builds "build/to.zap.app" and runs the tests
+open "build/to.zap.app"
 ```
 
 You need Xcode or just the Command Line Tools (`xcode-select --install`); there are no other dependencies.
-Move `ZAP Remote.app` to Applications if you like. An app you build yourself opens without the approval step.
+Move `to.zap.app` to Applications if you like. An app you build yourself opens without the approval step.
 
 ### Updates
 
-ZAP never checks for updates by itself. In **Settings → About**, click **Check for Updates**: ZAP asks GitHub
+to.zap never checks for updates by itself. In **Settings → About**, click **Check for Updates**: to.zap asks GitHub
 once for the latest stable release and tells you whether a newer version exists. It never downloads or
 installs anything.
 
-- Installed with Homebrew: `brew upgrade --cask skiliz/tap/zap-remote` (your pairing and settings are kept).
+- Installed with Homebrew: `brew upgrade --cask skiliz/tap/tozap-remote` (your pairing and settings are kept).
 - Downloaded: get the new version from its release page and replace the app in Applications.
 
 ## Getting started
 
-1. Open ZAP. If no TV is paired yet, Settings opens on **Device**.
-2. Make sure the Mac and the Fire TV are on the same network. Allow ZAP to find devices on your local network
+1. Open to.zap. If no TV is paired yet, Settings opens on **Device**.
+2. Make sure the Mac and the Fire TV are on the same network. Allow to.zap to find devices on your local network
    when macOS asks.
 3. Choose your Fire TV (or enter its address), click **Show PIN on TV**, and type the PIN the TV shows.
 4. Click the remote icon in the menu bar. That's it.
@@ -139,10 +139,10 @@ installs anything.
 | Light | Meaning |
 |---|---|
 | Green dot | The TV confirmed the connection in the last 10 minutes |
-| Hollow gray ring | Not checked recently. Open the remote to check: ZAP never checks in the background |
+| Hollow gray ring | Not checked recently. Open the remote to check: to.zap never checks in the background |
 | Amber ring (blinks gently) | Reconnecting or looking for the TV |
 | Red dot, dimmed remote | The TV is unreachable or rejected the pairing |
-| Red microphone | ZAP is listening |
+| Red microphone | to.zap is listening |
 | Blue dot at the bottom | Your Mac is using the TV as an AirPlay display (verified when extending the desktop) |
 
 The tooltip and VoiceOver describe the state in words.
@@ -152,7 +152,7 @@ The tooltip and VoiceOver describe the state in words.
 Hold the Voice button in the remote (or **V** while the remote is open, or the optional **⌃⌥V** anywhere) and
 speak; release to finish. The microphone is never on otherwise.
 
-- **Apple Speech (default).** Your speech is recognised on your Mac. ZAP understands Italian commands such as
+- **Apple Speech (default).** Your speech is recognised on your Mac. to.zap understands Italian commands such as
   *Apri Netflix*, *Home*, *Indietro*, *Conferma*, *Vai a destra / sinistra / su / giù*, *Pausa* and
   *Riprendi*. It doesn't send anything it isn't sure about. If your Mac can't recognise Italian on-device,
   nothing goes to Apple unless you turn on *Allow Apple server recognition* in Settings → Voice.
@@ -169,17 +169,17 @@ Fire TV Sticks don't support AirPlay out of the box, so you need an **AirPlay re
 - Commercial receivers also exist.
 - AirPlay receiver apps for Fire TV are third-party apps, not made or certified by Apple.
 
-Click **Mirror** in ZAP: it opens the receiver on the TV, checks that your Mac can see it, and points you to
+Click **Mirror** in to.zap: it opens the receiver on the TV, checks that your Mac can see it, and points you to
 **Control Center → Screen Mirroring**, where you choose to mirror or extend your display. macOS doesn't let apps
 start mirroring by themselves, so that last click is yours. To stop, choose Stop Mirroring there.
 
-ZAP doesn't stream video: macOS sends the screen and the receiver app shows it. Mirroring keeps running if you
-quit ZAP. How to install the receiver, what it does on your network, and what was tested:
+to.zap doesn't stream video: macOS sends the screen and the receiver app shows it. Mirroring keeps running if you
+quit to.zap. How to install the receiver, what it does on your network, and what was tested:
 [docs/MIRRORING.md](docs/MIRRORING.md).
 
 ## Privacy
 
-ZAP talks to:
+to.zap talks to:
 
 - your Fire TV;
 - by default, Amazon's image servers for the icons of your TV's apps (Settings → Advanced to turn off);
@@ -188,41 +188,41 @@ ZAP talks to:
 - GitHub, only when you click Check for Updates.
 
 There is no account, no analytics and no telemetry. The microphone is used only while you hold push-to-talk,
-and no audio is stored. Pairing data stays in `~/Library/Application Support/ZAP Remote`, readable only by
+and no audio is stored. Pairing data stays in `~/Library/Application Support/to.zap`, readable only by
 you. The full details are in [PRIVACY.md](PRIVACY.md), and security in [SECURITY.md](SECURITY.md).
 
 ## Troubleshooting
 
-- **"ZAP can't see your network":** allow ZAP in System Settings → Privacy & Security → Local Network, then
+- **"to.zap can't see your network":** allow to.zap in System Settings → Privacy & Security → Local Network, then
   search again.
 - **The TV isn't found or shows "Device unavailable":**
   - the Mac and the TV must be on the same network, and the TV on;
   - some phone hotspots and guest networks isolate devices from each other;
   - you can enter the TV's address by hand when pairing.
-- **"Pair again":** the TV rejected ZAP's pairing. Use Settings → Device → Pair Again.
+- **"Pair again":** the TV rejected to.zap's pairing. Use Settings → Device → Pair Again.
 - **Push-to-talk anywhere does nothing:** another app may already use ⌃⌥V. Settings → Voice tells you when
   that happens.
 - **Voice is off:** check Microphone (and, for Apple Speech, Speech Recognition) in System Settings →
   Privacy & Security.
 - **Mirroring finds no receiver:** install AirPlay Server on the TV ([docs/MIRRORING.md](docs/MIRRORING.md))
   and open it once. If it says "error starting server", another receiver app is using the AirPlay port.
-- **"Apple could not verify ZAP Remote…":** expected for a release that isn't notarized; approve it with
+- **"Apple could not verify to.zap…":** expected for a release that isn't notarized; approve it with
   **Open Anyway** as described in [Install](#install).
 
 ## Uninstall
 
 1. If *Launch at login* is on, turn it off in Settings → General.
-2. Quit ZAP (Settings → General → Quit ZAP) and move `ZAP Remote.app` to the Trash.
-3. To remove the pairing and settings too, delete `~/Library/Application Support/ZAP Remote` and
-   `~/Library/Preferences/local.zap.app.plist`.
+2. Quit to.zap (Settings → General → Quit to.zap) and move `to.zap.app` to the Trash.
+3. To remove the pairing and settings too, delete `~/Library/Application Support/to.zap` and
+   `~/Library/Preferences/local.tozap.app.plist`.
 
-With Homebrew, `brew uninstall --cask zap-remote` removes the app and keeps your pairing; add `--zap` to remove
-ZAP's data as well.
+With Homebrew, `brew uninstall --cask tozap-remote` removes the app and keeps your pairing; add `--zap` to remove
+to.zap's data as well.
 
 ## Building and contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Reports from other Fire TV models are especially welcome.
-[docs/PROTOCOL.md](docs/PROTOCOL.md) explains how ZAP talks to the TV, and
+[docs/PROTOCOL.md](docs/PROTOCOL.md) explains how to.zap talks to the TV, and
 [docs/RELEASING.md](docs/RELEASING.md) how releases are built.
 
 ## License
@@ -231,4 +231,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Reports from other Fire TV models are es
 
 ---
 
-<sub>ZAP is an independent third-party application and is not affiliated with, endorsed by, or sponsored by Amazon. Amazon, Fire TV, Fire OS and Alexa are trademarks of Amazon.com, Inc. or its affiliates. Apple, AirPlay and macOS are trademarks of Apple Inc., registered in the U.S. and other countries and regions. AirPlay receiver apps for Fire TV are third-party apps, not made or certified by Apple. ZAP is unrelated to the ZAP web security scanner (ZAP by Checkmarx, formerly OWASP ZAP). Other product names are trademarks of their respective owners and are used only to describe compatibility.</sub>
+<sub>to.zap is an independent third-party application and is not affiliated with, endorsed by, or sponsored by Amazon. Amazon, Fire TV, Fire OS and Alexa are trademarks of Amazon.com, Inc. or its affiliates. Apple, AirPlay and macOS are trademarks of Apple Inc., registered in the U.S. and other countries and regions. AirPlay receiver apps for Fire TV are third-party apps, not made or certified by Apple. to.zap is unrelated to the ZAP web security scanner (ZAP by Checkmarx, formerly OWASP ZAP) and to other products named ZAP or Tozap. Other product names are trademarks of their respective owners and are used only to describe compatibility.</sub>

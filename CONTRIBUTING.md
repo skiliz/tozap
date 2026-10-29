@@ -1,6 +1,6 @@
-# Contributing to ZAP
+# Contributing to to.zap
 
-Thanks for helping! ZAP aims to stay a small, native, dependable Mac utility, so please keep changes
+Thanks for helping! to.zap aims to stay a small, native, dependable Mac utility, so please keep changes
 focused.
 
 ## Reporting issues
@@ -19,8 +19,8 @@ Requirements: macOS 14 or later on Apple silicon, and Xcode or just the Command 
 (`xcode-select --install`). There are no package dependencies.
 
 ```sh
-scripts/build.sh test      # builds build/ZAP Remote.app, build/zapctl, runs the tests
-open "build/ZAP Remote.app"
+scripts/build.sh test      # builds build/to.zap.app, build/zapctl, runs the tests
+open "build/to.zap.app"
 ```
 
 The build uses `swiftc` directly so it works without an Xcode project. The app avoids `@State` because
@@ -47,13 +47,13 @@ By contributing you agree that your contribution is licensed under the MIT Licen
 `ZAP_DEVTOOLS=1 scripts/build.sh` builds a developer version that adds:
 
 - an offline UI preview that never contacts the TV or the network:
-  `open -n "build/ZAP Remote.app" --args -ZAPOfflinePreview YES`, plus `-ZAPSettingsSection about` to open a
+  `open -n "build/to.zap.app" --args -ZAPOfflinePreview YES`, plus `-ZAPSettingsSection about` to open a
   Settings section and `-ZAPMenuBarDemo YES` to cycle the menu bar light through its states;
-- `-ZAPSettingsSection <section> -ZAPCaptureSettings <file.png>` opens a Settings section, captures ZAP's own
+- `-ZAPSettingsSection <section> -ZAPCaptureSettings <file.png>` opens a Settings section, captures to.zap's own
   window (no Screen Recording permission needed) and quits; used for the README screenshots. Add
   `-ZAPCaptureSize 820x660` (the default window size) for a known size; the remembered window position is left alone;
 - a `zapremote://` automation interface for testing (see `RemoteModel.handleURL`). It is enabled only by
-  `defaults write local.zap.app automationURLs -bool true`; turn it off with
-  `defaults delete local.zap.app automationURLs`.
+  `defaults write local.tozap.app automationURLs -bool true`; turn it off with
+  `defaults delete local.tozap.app automationURLs`.
 
 None of this is compiled into release builds, and `scripts/package.sh` refuses to package a developer build.

@@ -35,7 +35,7 @@ public final class FireTVClient: @unchecked Sendable {
     private let token: String?
     private let trust: RootPinningDelegate
     private let session: URLSession
-    private let log = Logger(subsystem: "local.zap.app", category: "client")
+    private let log = Logger(subsystem: "local.tozap.app", category: "client")
 
     public init(host: String, token: String?, pinnedRoot: Data?) {
         self.host = host

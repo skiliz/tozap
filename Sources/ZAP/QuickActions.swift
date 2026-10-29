@@ -142,7 +142,7 @@ final class AppIconStore {
         config.httpCookieStorage = nil
         config.httpShouldSetCookies = false
         config.timeoutIntervalForRequest = 15
-        config.httpAdditionalHeaders = ["User-Agent": "ZAP", "Accept": "image/*"]
+        config.httpAdditionalHeaders = ["User-Agent": "to.zap", "Accept": "image/*"]
         return URLSession(configuration: config, delegate: RefuseRedirects(), delegateQueue: nil)
     }()
 

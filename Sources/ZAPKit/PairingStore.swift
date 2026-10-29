@@ -50,10 +50,11 @@ public enum PairingStore {
         .map { URL(fileURLWithPath: $0, isDirectory: true) }
         ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
 
-    /// ZAP's own folder. Not "ZAP": that is the ZAP web security scanner's folder, which its Homebrew cask removes.
-    public static let directory = applicationSupport.appendingPathComponent("ZAP Remote", isDirectory: true)
-    /// Where pre-release 1.0 builds kept their files, inside the scanner's folder name; moved once.
-    static let previousDirectory = applicationSupport.appendingPathComponent("ZAP", isDirectory: true)
+    /// to.zap's own folder.
+    public static let directory = applicationSupport.appendingPathComponent("to.zap", isDirectory: true)
+    /// Where pre-release builds kept their files, newest first: "ZAP Remote", then "ZAP" (the ZAP web security
+    /// scanner's folder name). Moved once.
+    static let previousDirectories = ["ZAP Remote", "ZAP"].map { applicationSupport.appendingPathComponent($0, isDirectory: true) }
     /// Where the pre-1.0 "Fire Remote" builds kept their data.
     static let legacyDirectory = applicationSupport.appendingPathComponent("Fire Remote", isDirectory: true)
 
@@ -65,16 +66,18 @@ public enum PairingStore {
     static var migrationMarker: URL { directory.appendingPathComponent(".legacy-store-checked") }
 
     /// Runs once, so nobody has to pair again and a later "Forget This TV" can't be undone:
-    /// - files from pre-release builds in `…/ZAP` are moved to `…/ZAP Remote` (copied, read back, then only ZAP's
-    ///   own files are removed from the old folder — anything else in it is left alone);
+    /// - files from pre-release builds in `…/ZAP Remote` or `…/ZAP` are moved to `…/to.zap` (copied, read back, then
+    ///   only the app's own files are removed from the old folder — anything else in it is left alone);
     /// - otherwise a pairing from the pre-1.0 "Fire Remote" builds is copied (never moved).
     public static func migrateLegacyStoreIfNeeded() {
         let files = FileManager.default
         guard !files.fileExists(atPath: migrationMarker.path) else { return }
         defer { try? write(Data(), to: migrationMarker) }
         guard !files.fileExists(atPath: deviceFile.path) else { return }
-        if files.fileExists(atPath: previousDirectory.appendingPathComponent("device.json").path) {
-            moveOwnFiles(from: previousDirectory)
+        if let previous = previousDirectories.first(where: {
+            files.fileExists(atPath: $0.appendingPathComponent("device.json").path)
+        }) {
+            moveOwnFiles(from: previous)
             return
         }
         guard files.fileExists(atPath: legacyDirectory.appendingPathComponent("device.json").path) else { return }
@@ -95,8 +98,11 @@ public enum PairingStore {
                 try? write(data, to: directory.appendingPathComponent(name))
             }
         }
-        // Remove the old copies only once the pairing reads back from the new place.
+        // Remove the old copies only once the pairing reads back from the new place. Icon caches move as they are.
         guard load() != nil else { return }
+        for folder in ownFolders where !files.fileExists(atPath: directory.appendingPathComponent(folder).path) {
+            try? files.moveItem(at: old.appendingPathComponent(folder), to: directory.appendingPathComponent(folder))
+        }
         for name in ownFiles + ownFolders { try? files.removeItem(at: old.appendingPathComponent(name)) }
         if (try? files.contentsOfDirectory(atPath: old.path))?.isEmpty == true { try? files.removeItem(at: old) }
     }
@@ -113,7 +119,7 @@ public enum PairingStore {
     /// Removes the pairing and the saved app list, including older copies, so the token is gone from disk.
     public static func forget() {
         let files = FileManager.default
-        for folder in [directory, previousDirectory, legacyDirectory] {
+        for folder in [directory, legacyDirectory] + previousDirectories {
             for name in ["device.json", "apps.json"] { try? files.removeItem(at: folder.appendingPathComponent(name)) }
         }
         try? write(Data(), to: migrationMarker)

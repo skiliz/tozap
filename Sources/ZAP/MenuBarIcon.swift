@@ -34,7 +34,7 @@ enum MenuBarIcon {
             return true
         }
         image.isTemplate = false
-        image.accessibilityDescription = "ZAP"
+        image.accessibilityDescription = "to.zap"
         cache[state] = image
         return image
     }
@@ -159,7 +159,7 @@ enum MenuBarStatusText {
     static func debugSummary(expected: NSImage) -> String {
         guard let button = button ?? find() else { return "status item button not found" }
         let image = button.image
-        return "button found, image is ZAP's: \(image === expected), template: \(image?.isTemplate ?? false), "
+        return "button found, image is to.zap's: \(image === expected), template: \(image?.isTemplate ?? false), "
             + "appearance: \(button.effectiveAppearance.name.rawValue)"
     }
 #endif

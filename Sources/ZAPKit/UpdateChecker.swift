@@ -1,14 +1,16 @@
 import Foundation
 
-/// ZAP's public project addresses. Everything the update check and About open is derived from these.
+/// to.zap's public project addresses. Everything the update check and About open is derived from these.
 public enum ZAPProject {
-    public static let repository = URL(string: "https://github.com/skiliz/zap")!
-    public static let releasesPage = URL(string: "https://github.com/skiliz/zap/releases")!
+    public static let repository = URL(string: "https://github.com/skiliz/tozap")!
+    public static let releasesPage = URL(string: "https://github.com/skiliz/tozap/releases")!
     /// The latest published full release: GitHub never returns drafts or prereleases here, and answers 404
     /// when there is none.
-    public static let latestReleaseAPI = URL(string: "https://api.github.com/repos/skiliz/zap/releases/latest")!
-    public static let homebrewCask = "zap-remote"
-    public static let homebrewUpgradeCommand = "brew upgrade --cask skiliz/tap/zap-remote"
+    public static let latestReleaseAPI = URL(string: "https://api.github.com/repos/skiliz/tozap/releases/latest")!
+    public static let homebrewCask = "tozap-remote"
+    public static let homebrewUpgradeCommand = "brew upgrade --cask skiliz/tap/tozap-remote"
+    /// The app bundle as installed (also by the Homebrew cask).
+    public static let appBundleName = "to.zap.app"
 }
 
 /// A Semantic Versioning 2.0 version ("1.2.3", "v1.2.3-beta.1+5"). One or two numeric components are
@@ -101,7 +103,7 @@ public enum UpdateChecker {
         var request = URLRequest(url: ZAPProject.latestReleaseAPI)
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
         request.setValue("2022-11-28", forHTTPHeaderField: "X-GitHub-Api-Version")
-        request.setValue("ZAP", forHTTPHeaderField: "User-Agent")
+        request.setValue("to.zap", forHTTPHeaderField: "User-Agent")
         do {
             let (bytes, response) = try await session.bytes(for: request)
             guard let http = response as? HTTPURLResponse else { return .invalidResponse }
@@ -200,7 +202,7 @@ private final class GitHubAPIRedirectsOnly: NSObject, URLSessionTaskDelegate {
 
 /// How this copy of ZAP was installed, only when that can be verified on disk.
 public enum InstallationSource: Equatable, Sendable {
-    /// Homebrew's Caskroom holds the zap-remote cask and the running app sits in an Applications folder.
+    /// Homebrew's Caskroom holds the tozap-remote cask and the running app sits in an Applications folder.
     case homebrew
     /// Downloaded, built from source, or anything else that can't be told apart.
     case unknown
@@ -210,7 +212,7 @@ public enum InstallationSource: Equatable, Sendable {
                               fileExists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }) -> InstallationSource {
         let folder = (bundlePath as NSString).deletingLastPathComponent
         let inApplications = folder == "/Applications" || folder == (home as NSString).appendingPathComponent("Applications")
-        guard inApplications, (bundlePath as NSString).lastPathComponent == "ZAP Remote.app" else { return .unknown }
+        guard inApplications, (bundlePath as NSString).lastPathComponent == ZAPProject.appBundleName else { return .unknown }
         let caskrooms = ["/opt/homebrew/Caskroom", "/usr/local/Caskroom"]
         return caskrooms.contains { fileExists("\($0)/\(ZAPProject.homebrewCask)") } ? .homebrew : .unknown
     }

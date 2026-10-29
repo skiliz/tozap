@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Something in ZAP doesn't work as described
+about: Something in to.zap doesn't work as described
 labels: bug
 ---
 
@@ -11,7 +11,7 @@ labels: bug
 **Steps to reproduce**
 
 **Environment**
-- ZAP version (Settings → About):
+- to.zap version (Settings → About):
 - macOS version and Mac model:
 - Fire TV model and Fire OS version (on the TV: Settings → My Fire TV → About):
 - Voice mode, if relevant (Apple Speech / Alexa):

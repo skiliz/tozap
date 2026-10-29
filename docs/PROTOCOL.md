@@ -1,4 +1,4 @@
-# How ZAP talks to a Fire TV
+# How to.zap talks to a Fire TV
 
 Interoperability notes for contributors. This describes the local network interface used by the Fire TV
 mobile app, as documented by open-source projects (see [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md))
@@ -18,7 +18,7 @@ and as observed on the verified device. Amazon does not document it and may chan
 | Voice to Alexa | `POST /v1/FireTV/voiceCommand?action=start`, then `wss://<tv>:9090/` with 16 kHz mono 16-bit PCM in binary frames, close to finish, `action=stop` |
 
 All `:8080` and `:9090` requests carry `x-api-key` (a fixed public value of the protocol) and, after
-pairing, `x-client-token`. TLS: see [SECURITY.md](../SECURITY.md) — ZAP pins the Amazon root chain.
+pairing, `x-client-token`. TLS: see [SECURITY.md](../SECURITY.md) — to.zap pins the Amazon root chain.
 
 ## Previous / next (not available)
 
@@ -35,7 +35,7 @@ the verified Fire TV Stick (Fire OS 7.7.1.7), with the owner watching the TV:
 
 The other open-source implementations also have no such command; where they show "next", it sends `scan`.
 Android's real skip keys (`KEYCODE_MEDIA_NEXT` / `KEYCODE_MEDIA_PREVIOUS`) are reachable only through ADB
-debugging on the TV, which ZAP doesn't use. ZAP's side buttons therefore stay **Rewind** and
+debugging on the TV, which to.zap doesn't use. to.zap's side buttons therefore stay **Rewind** and
 **Fast-forward**, named for what they send. What `scan` does is up to the app in front: most seek, and in one
 IPTV app it changed channel.
 
@@ -43,9 +43,9 @@ IPTV app it changed channel.
 
 The live investigation on a real device is in [NOW_PLAYING.md](NOW_PLAYING.md); in short:
 
-ZAP models playback metadata with its provenance (`Sources/ZAPKit/NowPlaying.swift`) and shows a title in
+to.zap models playback metadata with its provenance (`Sources/ZAPKit/NowPlaying.swift`) and shows a title in
 the status capsule only when it comes from a source verified on a real device. **No source is verified
-yet**, so ZAP never shows a title, artwork or progress today. What is known, from the read-only calls ZAP
+yet**, so to.zap never shows a title, artwork or progress today. What is known, from the read-only calls to.zap
 already makes:
 
 | Source | What it can tell | Status |
@@ -54,7 +54,7 @@ already makes:
 | `GET /v1/FireTV/properties` | device properties (`dsn`, `osVersion`, capability flags) — no playback fields | observed |
 | `GET /v1/FireTV/keyboard` | on-screen keyboard state only | observed |
 | DIAL `GET http://<tv>:8009/apps/<name>` | at most "running"/"stopped" for apps registered with DIAL; never a title | needs a live test |
-| Android media sessions | would need ADB debugging on the TV, which ZAP does not ask users to enable | out of scope |
+| Android media sessions | would need ADB debugging on the TV, which to.zap does not ask users to enable | out of scope |
 
 Streaming apps decide what they publish: Netflix and other DRM services may expose no title at all even
 where a media session exists. Any new source must be confirmed on a real TV (with the owner's approval)

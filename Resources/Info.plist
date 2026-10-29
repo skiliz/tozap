@@ -2,15 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- Never change: macOS keys permissions, preferences and the login item to it (pre-release builds used local.fireremote.app). -->
+	<!-- Never change: macOS keys permissions, preferences and the login item to it (pre-release builds used local.zap.app and local.fireremote.app). -->
 	<key>CFBundleIdentifier</key>
-	<string>local.zap.app</string>
+	<string>local.tozap.app</string>
 	<key>CFBundleName</key>
-	<string>ZAP</string>
+	<string>to.zap</string>
 	<key>CFBundleDisplayName</key>
-	<string>ZAP</string>
+	<string>to.zap</string>
 	<key>CFBundleExecutable</key>
-	<string>ZAP</string>
+	<string>to.zap</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -28,16 +28,16 @@
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>ZAP talks to your Fire TV on your local network to send remote-control commands, and looks for an AirPlay receiver for screen mirroring.</string>
+	<string>to.zap talks to your Fire TV on your local network to send remote-control commands, and looks for an AirPlay receiver for screen mirroring.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_amzn-wplay._tcp</string>
 		<string>_airplay._tcp</string>
 	</array>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>ZAP uses the microphone only while you hold push-to-talk: to recognise voice commands on this Mac or, in Alexa mode, to send your voice through the Fire TV to Amazon's Alexa service. Nothing is recorded or stored.</string>
+	<string>to.zap uses the microphone only while you hold push-to-talk: to recognise voice commands on this Mac or, in Alexa mode, to send your voice through the Fire TV to Amazon's Alexa service. Nothing is recorded or stored.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>ZAP turns what you say while holding push-to-talk into remote commands. Recognition runs on this Mac; Apple's servers are used only if you allow it in Settings.</string>
+	<string>to.zap turns what you say while holding push-to-talk into remote commands. Recognition runs on this Mac; Apple's servers are used only if you allow it in Settings.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>

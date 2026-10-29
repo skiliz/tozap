@@ -24,12 +24,12 @@ case "$MODE" in
     : "${ZAP_NOTARY_PROFILE:?Set ZAP_NOTARY_PROFILE to a notarytool keychain profile}"
     [[ "$ZAP_SIGN_IDENTITY" == "Developer ID Application:"* ]] \
       || { echo "ZAP_SIGN_IDENTITY must be a Developer ID Application identity."; exit 1; }
-    TEMPLATE=zap-remote.rb.in
+    TEMPLATE=tozap-remote.rb.in
     ;;
   adhoc)
     [[ -z "${ZAP_SIGN_IDENTITY:-}${ZAP_NOTARY_PROFILE:-}" ]] \
       || { echo "Ad-hoc mode: unset ZAP_SIGN_IDENTITY and ZAP_NOTARY_PROFILE (they belong to the Developer ID mode)."; exit 1; }
-    TEMPLATE=zap-remote-adhoc.rb.in
+    TEMPLATE=tozap-remote-adhoc.rb.in
     ;;
   *)
     echo "ZAP_RELEASE_MODE must be developer-id or adhoc."; exit 1 ;;
@@ -54,15 +54,15 @@ NOTES=$(mktemp)
 if [[ -n "${ZAP_RELEASE_DIST:-}" ]]; then
   [[ "$MODE" == adhoc ]] || { echo "ZAP_RELEASE_DIST is for ad-hoc releases."; exit 1; }
   rm -rf dist && mkdir dist
-  cp "$ZAP_RELEASE_DIST/ZAP-$VERSION.zip" "$ZAP_RELEASE_DIST/ZAP-$VERSION.dmg" "$ZAP_RELEASE_DIST/SHA256SUMS.txt" dist/
+  cp "$ZAP_RELEASE_DIST/tozap-$VERSION.zip" "$ZAP_RELEASE_DIST/tozap-$VERSION.dmg" "$ZAP_RELEASE_DIST/SHA256SUMS.txt" dist/
   (cd dist && shasum -a 256 -c SHA256SUMS.txt) || { echo "Checksums don't match."; exit 1; }
   CHECK=$(mktemp -d)
-  ditto -x -k "dist/ZAP-$VERSION.zip" "$CHECK"
-  APP="$CHECK/ZAP Remote.app"
+  ditto -x -k "dist/tozap-$VERSION.zip" "$CHECK"
+  APP="$CHECK/to.zap.app"
   [[ "$(plutil -extract CFBundleShortVersionString raw "$APP/Contents/Info.plist")" == "$VERSION" ]] \
-    && [[ "$(plutil -extract CFBundleIdentifier raw "$APP/Contents/Info.plist")" == "local.zap.app" ]] \
-    && [[ "$(lipo -archs "$APP/Contents/MacOS/ZAP")" == "arm64" ]] \
-    || { echo "The prebuilt app doesn't match version $VERSION, local.zap.app and arm64."; exit 1; }
+    && [[ "$(plutil -extract CFBundleIdentifier raw "$APP/Contents/Info.plist")" == "local.tozap.app" ]] \
+    && [[ "$(lipo -archs "$APP/Contents/MacOS/to.zap")" == "arm64" ]] \
+    || { echo "The prebuilt app doesn't match version $VERSION, local.tozap.app and arm64."; exit 1; }
   codesign --verify --strict --deep "$APP"
   [[ "$(codesign -dv "$APP" 2>&1)" == *"Signature=adhoc"* ]] || { echo "Expected an ad-hoc signature."; exit 1; }
   [[ "$(codesign -dv "$APP" 2>&1)" == *"(adhoc,runtime)"* ]] || { echo "Expected the hardened runtime."; exit 1; }
@@ -70,21 +70,21 @@ if [[ -n "${ZAP_RELEASE_DIST:-}" ]]; then
      == "com.apple.security.device.audio-input" ]] || { echo "Unexpected entitlements."; exit 1; }
   # The DMG must hold the same app as the ZIP.
   MOUNT=$(mktemp -d)
-  hdiutil attach -quiet -readonly -nobrowse -mountpoint "$MOUNT" "dist/ZAP-$VERSION.dmg"
-  if diff -rq "$APP" "$MOUNT/ZAP Remote.app" >/dev/null; then SAME=yes; else SAME=no; fi
+  hdiutil attach -quiet -readonly -nobrowse -mountpoint "$MOUNT" "dist/tozap-$VERSION.dmg"
+  if diff -rq "$APP" "$MOUNT/to.zap.app" >/dev/null; then SAME=yes; else SAME=no; fi
   hdiutil detach -quiet "$MOUNT"
   [[ "$SAME" == yes ]] || { echo "The DMG's app differs from the ZIP's."; exit 1; }
   scripts/build.sh test   # the tagged source still builds and passes its tests
   # The build is reproducible: the tagged source must produce the very bundle being published (binary,
   # signature, LICENSE and notices).
-  diff -rq "build/ZAP Remote.app" "$APP" >/dev/null \
+  diff -rq "build/to.zap.app" "$APP" >/dev/null \
     || { echo "The tagged source doesn't rebuild the published app bundle."; exit 1; }
   rm -rf "$CHECK"
 else
   scripts/build.sh test
 fi
-APP="build/ZAP Remote.app"
-[[ "$(lipo -archs "$APP/Contents/MacOS/ZAP")" == "arm64" ]] || { echo "Expected an arm64-only build."; exit 1; }
+APP="build/to.zap.app"
+[[ "$(lipo -archs "$APP/Contents/MacOS/to.zap")" == "arm64" ]] || { echo "Expected an arm64-only build."; exit 1; }
 
 if [[ "$MODE" == developer-id ]]; then
   scripts/notarize.sh   # packages, notarizes, staples and checks Gatekeeper
@@ -105,21 +105,21 @@ UNSIGNED
 fi
 awk -v v="$VERSION" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md >> "$NOTES"
 
-git tag -a "$TAG" -m "ZAP $VERSION"
+git tag -a "$TAG" -m "to.zap $VERSION"
 git push origin "$TAG"
-gh release create "$TAG" "dist/ZAP-$VERSION.dmg" "dist/ZAP-$VERSION.zip" dist/SHA256SUMS.txt \
-  --title "ZAP $VERSION" --notes-file "$NOTES" --draft
+gh release create "$TAG" "dist/tozap-$VERSION.dmg" "dist/tozap-$VERSION.zip" dist/SHA256SUMS.txt \
+  --title "to.zap $VERSION" --notes-file "$NOTES" --draft
 rm "$NOTES"
 
-ZIP_SHA=$(shasum -a 256 "dist/ZAP-$VERSION.zip" | awk '{print $1}')
+ZIP_SHA=$(shasum -a 256 "dist/tozap-$VERSION.zip" | awk '{print $1}')
 mkdir -p "$TAP/Casks"
-sed -e "s/@VERSION@/$VERSION/" -e "s/@SHA256@/$ZIP_SHA/" "$TAP/templates/$TEMPLATE" > "$TAP/Casks/zap-remote.rb"
-if grep -q "@[A-Z0-9]*@" "$TAP/Casks/zap-remote.rb"; then echo "Unfilled placeholder in the cask."; exit 1; fi
+sed -e "s/@VERSION@/$VERSION/" -e "s/@SHA256@/$ZIP_SHA/" "$TAP/templates/$TEMPLATE" > "$TAP/Casks/tozap-remote.rb"
+if grep -q "@[A-Z0-9]*@" "$TAP/Casks/tozap-remote.rb"; then echo "Unfilled placeholder in the cask."; exit 1; fi
 cat <<NEXT
 
 Draft release $TAG created ($MODE): download its ZIP on a clean user account, test it as described in
 docs/RELEASING.md, then publish the release.
-Wrote $TAP/Casks/zap-remote.rb (version $VERSION, sha256 $ZIP_SHA). Once the release is public:
-  brew audit --cask --strict --online skiliz/tap/zap-remote     (not --new: it requires notarization)
-then commit and push the tap, and test: brew install --cask skiliz/tap/zap-remote
+Wrote $TAP/Casks/tozap-remote.rb (version $VERSION, sha256 $ZIP_SHA). Once the release is public:
+  brew audit --cask --strict --online skiliz/tap/tozap-remote     (not --new: it requires notarization)
+then commit and push the tap, and test: brew install --cask skiliz/tap/tozap-remote
 NEXT

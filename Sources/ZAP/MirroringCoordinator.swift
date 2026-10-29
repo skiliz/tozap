@@ -84,7 +84,7 @@ final class MirroringCoordinator {
 
     @ObservationIgnored private var expiry: Task<Void, Never>?
 
-    @ObservationIgnored private let log = Logger(subsystem: "local.zap.app", category: "mirroring")
+    @ObservationIgnored private let log = Logger(subsystem: "local.tozap.app", category: "mirroring")
 
     func close() { stage = .idle }
 

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to ZAP are documented here. The format follows
+All notable changes to to.zap are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
@@ -30,13 +30,13 @@ First public release.
 - **Voice:** push-to-talk with Italian commands recognised on the Mac (Apple Speech), or relayed to Alexa
   through the Fire TV. An optional global ⌃⌥V shortcut, with a warning if another app already uses it.
 - **Screen Mirroring helper:** opens the AirPlay Server receiver app on the TV, checks that the Mac can see it,
-  and guides macOS Screen Mirroring. ZAP doesn't stream video; mirroring continues if ZAP quits.
+  and guides macOS Screen Mirroring. to.zap doesn't stream video; mirroring continues if to.zap quits.
 - **Check for Updates** in Settings → About: one request to GitHub's public API when clicked, never in the
   background. It compares versions by Semantic Versioning, never offers prereleases, and points Homebrew
   installs to `brew upgrade`.
 - **A Settings window** with General, Device, Apps, Voice, Advanced and About.
   - Launch at login uses macOS login items.
-  - The menu bar icon can be hidden: open ZAP again to reach Settings.
+  - The menu bar icon can be hidden: open to.zap again to reach Settings.
   - Copy Summary copies a diagnostic summary with no personal data.
   - About shows the app's identity, version, the GitHub repository and Check for Updates. The license and
     third-party notices ship inside the app bundle and in the repository.
@@ -48,9 +48,8 @@ First public release.
   is sent.
 - **Data from the TV is validated:** app IDs are checked, app icons are capped at 2 MB, and only PNG/JPEG
   thumbnails are decoded.
-- **Local data:** pairing data lives in `~/Library/Application Support/ZAP Remote`, written with mode 0600
-  from the start. Data from pre-release builds is moved once from the folder the ZAP web security scanner
-  also uses.
+- **Local data:** pairing data lives in `~/Library/Application Support/to.zap`, written with mode 0600
+  from the start. Pairing data and settings from pre-release builds (named "ZAP") are moved there once.
 - **Forget This TV:** removes the pairing, app list, icons and remembered receiver, including older copies.
 - **App icons:** downloaded with no cookies, cache or redirects. Logs keep app names, receiver names and
   speech private.

@@ -17,7 +17,7 @@ public final class AlexaVoiceRelay: @unchecked Sendable {
     private var socket: URLSessionWebSocketTask?
     private var buffer = Data()
     private var sendError: Error?
-    private let log = Logger(subsystem: "local.zap.app", category: "voice-relay")
+    private let log = Logger(subsystem: "local.tozap.app", category: "voice-relay")
 
     public init(client: FireTVClient) {
         self.client = client
