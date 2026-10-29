@@ -51,7 +51,8 @@ browser only if you ask. To check whether to.zap was installed with Homebrew, to
 ## Microphone
 
 - The microphone is used **only while you hold push-to-talk** (the Voice button, V in the panel, or the
-  optional ⌃⌥V shortcut). It stops when you release it, when the panel closes, when the audio device
+  optional ⌃⌥V shortcut), or, if you activate the Voice button with Full Keyboard Access or VoiceOver, until
+  you activate it again. It stops when you release it, when the panel closes, when the audio device
   changes, when the connection fails, and in any case after 15 seconds.
 - macOS shows its microphone indicator while to.zap listens, and asks for your permission the first time.
 - **No audio is recorded or stored** by to.zap.
@@ -67,8 +68,8 @@ Recognised text is shown in the panel and is not saved.
 
 While you hold push-to-talk, to.zap streams your voice (16 kHz audio) to your **Fire TV**, which sends it to
 **Amazon's Alexa service in the cloud**, as the voice button on the Fire TV remote does. Amazon's privacy
-terms apply to that audio. Settings and the Voice button's tooltip describe this mode as
-"Alexa on the Fire TV (Amazon cloud)".
+terms apply to that audio. Settings calls this mode "Alexa on the Fire TV (Amazon cloud)", and the Voice
+button's tooltip says "Sent to Alexa through the Fire TV (Amazon cloud)".
 
 ## Local network
 
@@ -76,9 +77,11 @@ to.zap asks macOS for Local Network access in order to:
 
 - find Fire TVs (Bonjour);
 - check whether the paired TV is reachable (a read-only DIAL request when the remote opens, which
-  Settings → Advanced can turn off);
+  Settings → Advanced can turn off, and again after a command fails). If the TV doesn't answer, to.zap looks
+  for it on the network with Bonjour, in case it got a new address;
 - send your commands to the TV's remote-control service;
-- find the TV's AirPlay receiver for Screen Mirroring.
+- find the TV's AirPlay receiver for Screen Mirroring: to.zap briefly connects to each AirPlay receiver it
+  sees to read its address, and remembers only the name of the one on your TV.
 
 ## Logs and diagnostics
 

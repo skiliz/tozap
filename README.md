@@ -150,7 +150,8 @@ The tooltip and VoiceOver describe the state in words.
 ## Voice control
 
 Hold the Voice button in the remote (or **V** while the remote is open, or the optional **⌃⌥V** anywhere) and
-speak; release to finish. The microphone is never on otherwise.
+speak; release to finish. With Full Keyboard Access or VoiceOver, activating the button starts listening and
+activating it again stops. The microphone is never on otherwise, and never for more than 15 seconds.
 
 - **Apple Speech (default).** Your speech is recognised on your Mac. to.zap understands Italian commands such as
   *Apri Netflix*, *Home*, *Indietro*, *Conferma*, *Vai a destra / sinistra / su / giù*, *Pausa* and
@@ -187,8 +188,8 @@ to.zap talks to:
 - Apple's speech servers, only if your Mac can't recognise Italian on-device and you allow it in Settings → Voice;
 - GitHub, only when you click Check for Updates.
 
-There is no account, no analytics and no telemetry. The microphone is used only while you hold push-to-talk,
-and no audio is stored. Pairing data stays in `~/Library/Application Support/to.zap`, readable only by
+There is no account, no analytics and no telemetry. The microphone is used only during push-to-talk (at most
+15 seconds), and no audio is stored. Pairing data stays in `~/Library/Application Support/to.zap`, readable only by
 you. The full details are in [PRIVACY.md](PRIVACY.md), and security in [SECURITY.md](SECURITY.md).
 
 ## Troubleshooting

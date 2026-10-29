@@ -18,8 +18,11 @@ bounty.
   never disabled, and redirects are never followed.
 - **The TV is never trusted by address alone.** If the TV moves to a new IP address, to.zap looks for the
   same advertised device ID, then requires the pinned TLS chain, a token the TV accepts, and the same
-  serial number before sending any command. The new address is saved only after that check; a missing or
-  different serial is refused.
+  serial number before sending any remote-control command. Reading the serial is itself an authenticated
+  request over the pinned chain. The new address is saved only after that check; a missing or different
+  serial is refused. A voice session also requires the pinned chain and an accepted token. Every Fire TV
+  presents the same Amazon root, so the pin proves "a Fire TV", and the serial check is what proves "your
+  Fire TV".
 - **Credentials** are stored in `~/Library/Application Support/to.zap/device.json`, written with mode
   0600 from the start, in a folder kept at 0700. Any process running as your user can read it, as with other
   per-user files. Moving the token to the Keychain is planned once releases carry a stable Developer ID
