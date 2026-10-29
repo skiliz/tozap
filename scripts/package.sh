@@ -30,7 +30,8 @@ hdiutil create -quiet -volname "ZAP $VERSION" -srcfolder "$STAGE" -fs HFS+ -form
 rm -rf "$STAGE"
 
 # ZIP: used by the Homebrew cask
-ditto -c -k --sequesterRsrc --keepParent "$APP" "$DIST/ZAP-$VERSION.zip"
+# No extended attributes or resource forks (macOS adds provenance data; the signature lives in _CodeSignature)
+ditto -c -k --norsrc --noextattr --keepParent "$APP" "$DIST/ZAP-$VERSION.zip"
 
 (cd $DIST && shasum -a 256 "ZAP-$VERSION.dmg" "ZAP-$VERSION.zip" > SHA256SUMS.txt)
 cat $DIST/SHA256SUMS.txt
