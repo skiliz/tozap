@@ -106,7 +106,7 @@ final class VoiceController {
     /// Hard stop even if a release event is lost (e.g. the panel closed mid-press).
     static let maxListeningSeconds: UInt64 = 15
     @ObservationIgnored private var configObserver: NSObjectProtocol?
-    @ObservationIgnored private let log = Logger(subsystem: "local.fireremote.app", category: "voice")
+    @ObservationIgnored private let log = Logger(subsystem: "local.zap.app", category: "voice")
 
     static let vocabulary = ["MaxPlayer", "Home", "Indietro", "Conferma", "Vai a destra", "Vai a sinistra",
                              "Su", "Giù", "Pausa", "Riprendi", "Menu", "Apri"]

@@ -3,8 +3,9 @@ import Observation
 import ServiceManagement
 import ZAPKit
 
-/// Where ZAP keeps its preferences. The offline preview works on a copy (`local.fireremote.app.preview`),
-/// refreshed from the real preferences at each preview launch, so trying things out changes nothing real.
+/// Where ZAP keeps its preferences (the `local.zap.app` domain). The offline preview works on a copy
+/// (`local.zap.app.preview`), refreshed from the real preferences at each preview launch, so trying things out
+/// changes nothing real.
 enum AppDefaults {
 #if ZAP_DEVTOOLS
     /// `-ZAPOfflinePreview YES` on the command line (argument domain, never stored). Developer builds only.
@@ -17,8 +18,22 @@ enum AppDefaults {
                                  "globalPushToTalk", "showMenuBarIcon", "showNowPlaying", "animationFeedback",
                                  "checkConnectionOnOpen", "airPlayReceiverNames"]
 
+    /// Also moved from pre-release builds (`local.fireremote.app`): the settings window's position.
+    static let migratedKeys = preferenceKeys + ["NSWindow Frame ZAPSettingsWindow"]  // AppKit's autosave key
+
+    /// Before anything reads a preference: settings from pre-release builds move to `local.zap.app` once.
+    static func migrateLegacyPreferences() {
+        guard Bundle.main.bundleIdentifier == "local.zap.app", !isOfflinePreview,
+              let legacy = UserDefaults(suiteName: PreferencesMigration.legacyDomain) else { return }
+        PreferencesMigration.migrate(from: legacy, to: UserDefaults.standard, keys: migratedKeys) {
+            UserDefaults.standard.removePersistentDomain(forName: PreferencesMigration.legacyDomain)
+            UserDefaults.standard.removePersistentDomain(forName: PreferencesMigration.legacyPreviewDomain)
+        }
+    }
+
     static let store: UserDefaults = {
-        guard isOfflinePreview, let preview = UserDefaults(suiteName: "local.fireremote.app.preview") else {
+        migrateLegacyPreferences()
+        guard isOfflinePreview, let preview = UserDefaults(suiteName: "local.zap.app.preview") else {
             return .standard
         }
         for key in preferenceKeys {

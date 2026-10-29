@@ -3,10 +3,10 @@ import Observation
 import SwiftUI
 import ZAPKit
 
-// The Settings window: a separate, native macOS window with a permanent sidebar of seven sections.
+// The Settings window: a separate, native macOS window with a permanent sidebar of six sections.
 
 enum SettingsSection: String, CaseIterable, Identifiable {
-    case general, device, apps, voice, mirroring, advanced, about
+    case general, device, apps, voice, advanced, about
 
     var id: String { rawValue }
 
@@ -16,7 +16,6 @@ enum SettingsSection: String, CaseIterable, Identifiable {
         case .device: return "Device"
         case .apps: return "Apps"
         case .voice: return "Voice"
-        case .mirroring: return "Mirroring"
         case .advanced: return "Advanced"
         case .about: return "About"
         }
@@ -28,7 +27,6 @@ enum SettingsSection: String, CaseIterable, Identifiable {
         case .device: return "tv"
         case .apps: return "square.grid.2x2"
         case .voice: return "mic"
-        case .mirroring: return "display"
         case .advanced: return "gearshape"
         case .about: return "info.circle"
         }
@@ -249,7 +247,6 @@ private struct SettingsContent: View {
         case .device: DeviceSettingsPage(model: model, navigation: navigation)
         case .apps: AppsSettingsPage(model: model, navigation: navigation)
         case .voice: VoiceSettingsPage(model: model, navigation: navigation)
-        case .mirroring: MirroringSettingsPage(model: model)
         case .advanced: AdvancedSettingsPage(model: model, navigation: navigation)
         case .about: AboutSettingsPage(navigation: navigation)
         }

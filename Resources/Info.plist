@@ -4,7 +4,7 @@
 <dict>
 	<!-- Kept from the pre-1.0 "Fire Remote" builds so existing permissions and settings carry over. -->
 	<key>CFBundleIdentifier</key>
-	<string>local.fireremote.app</string>
+	<string>local.zap.app</string>
 	<key>CFBundleName</key>
 	<string>ZAP</string>
 	<key>CFBundleDisplayName</key>

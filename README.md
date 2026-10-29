@@ -44,7 +44,7 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
 - **A Screen Mirroring helper:** ZAP opens the AirPlay receiver app on your TV and points you to macOS Screen
   Mirroring. macOS and the receiver do the streaming; ZAP never handles video.
 - **Check for Updates** in Settings → About, only when you click it.
-- **A native Settings window:** General, Device, Apps, Voice, Mirroring, Advanced and About.
+- **A native Settings window:** General, Device, Apps, Voice, Advanced and About.
 - **Local-first:** no account, no analytics, no telemetry, no server of ours.
 
 <p align="center">
@@ -52,8 +52,7 @@ A native macOS menu bar remote for Amazon Fire TV.<br>
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/settings-mirroring.png" alt="ZAP Settings, Mirroring section" width="400">
-  <img src="docs/screenshots/settings-about.png" alt="ZAP Settings, About section" width="400">
+  <img src="docs/screenshots/settings-about.png" alt="ZAP Settings, About section" width="480">
 </p>
 
 ## What ZAP can't do
@@ -215,7 +214,7 @@ you. The full details are in [PRIVACY.md](PRIVACY.md), and security in [SECURITY
 1. If *Launch at login* is on, turn it off in Settings → General.
 2. Quit ZAP (Settings → General → Quit ZAP) and move `ZAP Remote.app` to the Trash.
 3. To remove the pairing and settings too, delete `~/Library/Application Support/ZAP Remote` and
-   `~/Library/Preferences/local.fireremote.app.plist`.
+   `~/Library/Preferences/local.zap.app.plist`.
 
 With Homebrew, `brew uninstall --cask zap-remote` removes the app and keeps your pairing; add `--zap` to remove
 ZAP's data as well.

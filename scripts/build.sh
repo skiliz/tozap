@@ -39,7 +39,7 @@ cp $OBJ/ZAP "$APP/Contents/MacOS/ZAP"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 if [[ -n "${ZAP_DEVTOOLS:-}" ]]; then  # the automation URL scheme exists only in developer builds
   /usr/libexec/PlistBuddy -c "Add :CFBundleURLTypes array" -c "Add :CFBundleURLTypes:0 dict" \
-    -c "Add :CFBundleURLTypes:0:CFBundleURLName string local.fireremote.app.automation" \
+    -c "Add :CFBundleURLTypes:0:CFBundleURLName string local.zap.app.automation" \
     -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes array" -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes:0 string zapremote" \
     "$APP/Contents/Info.plist"
 fi

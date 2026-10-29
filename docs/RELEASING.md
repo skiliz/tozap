@@ -18,9 +18,10 @@ Both modes:
 
 1. The **GitHub CLI** (`gh`), logged in as a maintainer of `skiliz/zap`, and a clone of `skiliz/homebrew-tap`
    next to this repository (or set `ZAP_TAP_DIR`). Run the release from a fresh clone of `skiliz/zap` on `main`.
-2. A **bundle identifier** on a domain the publisher controls should replace `local.fireremote.app` in
-   `Resources/Info.plist` before the first public release, together with the preferences path in the cask's
-   `zap trash:`. The change resets the macOS permissions once, and preferences need a one-time migration.
+2. The bundle identifier is **`local.zap.app`** (`Resources/Info.plist`, the logging subsystem, the
+   preferences path in the cask's `zap trash:`). Never change it again: macOS keys permissions, preferences and
+   the login item to it. Pre-release builds used `local.fireremote.app`; their settings move across once
+   (`PreferencesMigration`).
 
 Developer ID mode only:
 

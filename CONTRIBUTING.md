@@ -52,7 +52,7 @@ By contributing you agree that your contribution is licensed under the MIT Licen
 - `-ZAPSettingsSection <section> -ZAPCaptureSettings <file.png>` opens a Settings section, captures ZAP's own
   window (no Screen Recording permission needed) and quits; used for the README screenshots;
 - a `zapremote://` automation interface for testing (see `RemoteModel.handleURL`). It is enabled only by
-  `defaults write local.fireremote.app automationURLs -bool true`; turn it off with
-  `defaults delete local.fireremote.app automationURLs`.
+  `defaults write local.zap.app automationURLs -bool true`; turn it off with
+  `defaults delete local.zap.app automationURLs`.
 
 None of this is compiled into release builds, and `scripts/package.sh` refuses to package a developer build.

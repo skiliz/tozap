@@ -684,130 +684,6 @@ private struct PermissionRow: View {
     }
 }
 
-// MARK: - Mirroring
-
-struct MirroringSettingsPage: View {
-    let model: RemoteModel
-
-    var body: some View {
-        SettingsPage(title: "Mirroring", subtitle: "Mirror your Mac to your Fire TV using a compatible AirPlay receiver.") {
-            SettingsGroup {
-                VStack(alignment: .leading, spacing: 12) {
-                    Role(symbol: "laptopcomputer", title: "Your Mac",
-                         text: "macOS sends your screen over AirPlay when you choose the TV in Control Center → Screen Mirroring.")
-                    Role(symbol: "tv", title: "Your Fire TV",
-                         text: "A receiver app shows it. ZAP is tested with \(MirroringCoordinator.freeReceiver.name), a free, open-source app you install on the TV yourself.")
-                    Role(symbol: "av.remote", title: "ZAP",
-                         text: "The Mirror button on the remote opens the receiver on the TV and checks that your Mac can see it. ZAP doesn't send, receive or process video.")
-                }
-                .padding(16)
-            }
-            .padding(.bottom, 6)
-            SettingsValueRow(title: "AirPlay receiver on the TV", subtitle: statusDetail,
-                             note: statusNote, noteIsWarning: isNotFound) {
-                Text(status)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(statusColor)
-                    .multilineTextAlignment(.trailing)
-            }
-            .accessibilityElement(children: .combine)
-            .onChange(of: status) { _, status in
-                AccessibilityNotification.Announcement("Receiver: \(status)").post()
-            }
-            SettingsDivider()
-            HStack(spacing: 10) {
-                Button("Open Receiver on TV") { model.startMirroring(recheck: true) }
-                    .disabled(!model.isPaired || RemoteModel.offlinePreview)
-                    .help("Opens \(MirroringCoordinator.freeReceiver.name) on the TV and checks that this Mac can see it (the same as Mirror on the remote)")
-                Button("Open Displays Settings…") { model.mirroring.openDisplaySettings() }
-                    .help("System Settings → Displays lists AirPlay displays to mirror or extend to")
-                Spacer()
-                Button { NSWorkspace.shared.open(ZAPProject.mirroringGuide) } label: {
-                    Label("Setup Guide", systemImage: "arrow.up.right").labelStyle(.titleAndIcon)
-                }
-                    .buttonStyle(.link)
-                    .foregroundStyle(Color(nsColor: .linkColor))
-                    .accessibilityAddTraits(.isLink)
-                    .help("How to install \(MirroringCoordinator.freeReceiver.name) on the Fire TV (opens GitHub)")
-            }
-            .padding(.vertical, 14)
-            SettingsDivider()
-            VStack(alignment: .leading, spacing: 6) {
-                Text("To stop, choose Stop Mirroring in Control Center → Screen Mirroring.")
-                Text("Some protected video may appear black when mirrored. Resolution and sound depend on macOS and the receiver app.")
-            }
-            .font(.system(size: 11.5))
-            .foregroundStyle(DS.Palette.textTertiary)
-            .fixedSize(horizontal: false, vertical: true)
-            .padding(.top, 12)
-        }
-    }
-
-    private var isNotFound: Bool {
-        if case .notFound = model.mirroring.stage { return true }
-        return false
-    }
-
-    /// Only what was actually seen: the receiver is found over Bonjour while it runs. Whether the app is
-    /// installed can't be read (sideloaded apps are missing from the TV's app list).
-    private var status: String {
-        switch model.mirroring.stage {
-        case .idle: return "Not checked"
-        case .searching: return "Checking…"
-        case .guide(let names): return names.first ?? "Ready"
-        case .notFound: return "Not found"
-        }
-    }
-
-    private var statusDetail: String {
-        switch model.mirroring.stage {
-        case .idle:
-            return model.isPaired ? "Checked when you press Mirror on the remote or Open Receiver on TV."
-                                  : "Pair a Fire TV in Device first."
-        case .searching(let message): return message
-        case .guide: return "Ready. Choose it in Control Center → Screen Mirroring."
-        case .notFound: return "Your Mac can't see an AirPlay receiver on the TV."
-        }
-    }
-
-    private var statusNote: String? {
-        guard isNotFound else { return nil }
-        return "Install \(MirroringCoordinator.freeReceiver.name) on the TV (see the Setup Guide), check that the Mac and the TV are on the same network, then try again."
-    }
-
-    private var statusColor: Color {
-        switch model.mirroring.stage {
-        case .guide: return DS.Palette.connected
-        case .notFound: return DS.Palette.warning
-        default: return DS.Palette.textSecondary
-        }
-    }
-
-    private struct Role: View {
-        let symbol: String
-        let title: String
-        let text: String
-
-        var body: some View {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Image(systemName: symbol)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(DS.Palette.textSecondary)
-                    .frame(width: 20)
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title).font(.system(size: 13, weight: .medium))
-                    Text(text)
-                        .font(.system(size: 12))
-                        .foregroundStyle(DS.Palette.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .accessibilityElement(children: .combine)
-        }
-    }
-}
-
 // MARK: - Advanced
 
 struct AdvancedSettingsPage: View {
@@ -916,7 +792,7 @@ private struct KeyboardShortcutsDisclosure: View {
                         Text("In Settings").font(.system(size: 11.5, weight: .semibold))
                             .foregroundStyle(DS.Palette.textSecondary)
                             .padding(.top, 6)
-                        ShortcutLine(keys: "⌘1 – ⌘7", action: "Switch section")
+                        ShortcutLine(keys: "⌘1 – ⌘\(SettingsSection.allCases.count)", action: "Switch section")
                     }
                     .padding(14)
                 }

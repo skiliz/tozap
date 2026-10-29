@@ -19,7 +19,7 @@ no automatic update check. It opens no listening ports. ZAP talks to:
 | The TV's list of installed apps | `~/Library/Application Support/ZAP Remote/apps.json` (0600) | app shortcuts |
 | App icons | `~/Library/Application Support/ZAP Remote/icons-v2/` | shortcut tiles |
 | The name of the TV's own AirPlay receiver, after you use Mirror | ZAP's preferences | the menu bar's mirroring light |
-| Settings: shortcuts, voice mode, consent to Apple server recognition, push-to-talk, menu bar and display options, connection checks, the Settings window position | `~/Library/Preferences/local.fireremote.app.plist` | preferences |
+| Settings: shortcuts, voice mode, consent to Apple server recognition, push-to-talk, menu bar and display options, connection checks, the Settings window position | `~/Library/Preferences/local.zap.app.plist` | preferences |
 
 None of this is sent anywhere. **Settings → Device → Forget This TV** deletes the pairing, the app list, the
 downloaded icons and the remembered receiver name, including the copy left by pre-1.0 "Fire Remote"
@@ -46,8 +46,7 @@ Nothing is downloaded or installed: if a newer version exists, ZAP shows it and 
 browser only if you ask. To check whether ZAP was installed with Homebrew, ZAP looks for Homebrew's
 `Caskroom/zap-remote` folder on your Mac; nothing about it is sent anywhere.
 
-**GitHub Repository** and **Setup Guide** (Settings → Mirroring) simply open pages on github.com in your
-browser.
+**GitHub Repository** simply opens ZAP's page on github.com in your browser.
 
 ## Microphone
 

@@ -34,7 +34,7 @@ First public release.
 - **Check for Updates** in Settings → About: one request to GitHub's public API when clicked, never in the
   background. It compares versions by Semantic Versioning, never offers prereleases, and points Homebrew
   installs to `brew upgrade`.
-- **A Settings window** with General, Device, Apps, Voice, Mirroring, Advanced and About.
+- **A Settings window** with General, Device, Apps, Voice, Advanced and About.
   - Launch at login uses macOS login items.
   - The menu bar icon can be hidden: open ZAP again to reach Settings.
   - Copy Summary copies a diagnostic summary with no personal data.

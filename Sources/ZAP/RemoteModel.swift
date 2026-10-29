@@ -224,7 +224,7 @@ final class RemoteModel {
     @ObservationIgnored private var panelOpen = false
     @ObservationIgnored private let hotKey = PushToTalkHotKey()
     @ObservationIgnored private(set) var automationEnabled = false
-    @ObservationIgnored private let log = Logger(subsystem: "local.fireremote.app", category: "app")
+    @ObservationIgnored private let log = Logger(subsystem: "local.zap.app", category: "app")
 
     private enum Op {
         case action(RemoteAction)
@@ -243,7 +243,7 @@ final class RemoteModel {
     func start() {
         // ZAP's windows are dark on their own (Settings window, remote panel), so the menu bar icon still
         // follows the real menu bar appearance.
-        // Hidden developer switch: `defaults write local.fireremote.app automationURLs -bool true`
+        // Hidden developer switch: `defaults write local.zap.app automationURLs -bool true`
 #if ZAP_DEVTOOLS
         automationEnabled = UserDefaults.standard.bool(forKey: "automationURLs") && !Self.offlinePreview
 #endif
@@ -688,14 +688,13 @@ final class RemoteModel {
 
     /// Opens AirPlay Server on the TV (the receiver verified with ZAP) unless a receiver on the TV is already
     /// visible, then reports what the Mac can see. Other receiver apps are used only when already running.
-    /// While a receiver was just found, the Mirror button opens Displays settings instead; `recheck` (Settings)
-    /// always opens and checks the receiver again.
-    func startMirroring(recheck: Bool = false) {
+    /// While a receiver was just found, the Mirror button opens Displays settings instead.
+    func startMirroring() {
         guard !Self.offlinePreview else {
             say("Offline preview — nothing sent")
             return
         }
-        if !recheck, case .guide = mirroring.stage {
+        if case .guide = mirroring.stage {
             mirroring.openDisplaySettings()
             return
         }
@@ -709,7 +708,7 @@ final class RemoteModel {
             case .guide(let targets):
                 flash(.receiverReady(targets.first ?? "AirPlay receiver"), for: 5)
             case .notFound:
-                say("No AirPlay receiver", for: 5)
+                say("No AirPlay receiver on the TV", for: 5)
             default:
                 break
             }
@@ -958,7 +957,7 @@ final class RemoteModel {
 
     /// `zapremote://key/<name>`, `media/<playPause|forward|rewind>`, `launch/<appId from the TV's list>`,
     /// `maxplayer`, `mirroring`, `ptt?seconds=3`, `voice-test?file=…&dry=1`, `ui?page=…&apps=1&nickname=…`,
-    /// `snapshot?path=…`. Enabled only with `defaults write local.fireremote.app automationURLs -bool true`.
+    /// `snapshot?path=…`. Enabled only with `defaults write local.zap.app automationURLs -bool true`.
     func handleURL(_ url: URL) {
         guard url.scheme == "zapremote" else { return }
         guard automationEnabled else {

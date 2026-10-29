@@ -238,6 +238,40 @@ if let notices = repositoryText("THIRD_PARTY_NOTICES.md")?.lowercased() {
           && notices.contains("they belong to their respective owners, and screenshots that show them do not imply any affiliation"),
           "app icon ownership notice stays in THIRD_PARTY_NOTICES.md")
 }
+// MARK: Bundle identifier and the one-time move of pre-release preferences
+
+if let plist = NSDictionary(contentsOfFile: "Resources/Info.plist") {
+    check(plist["CFBundleIdentifier"] as? String == "local.zap.app", "the bundle identifier is local.zap.app")
+} else {
+    check(false, "Resources/Info.plist is readable")
+}
+/// In-memory defaults, so the tests never write to ~/Library/Preferences.
+final class MemoryStore: PreferenceStore {
+    var values: [String: Any] = [:]
+    func object(forKey key: String) -> Any? { values[key] }
+    func set(_ value: Any?, forKey key: String) { values[key] = value }
+    func bool(forKey key: String) -> Bool { values[key] as? Bool ?? false }
+}
+let legacyDefaults = MemoryStore(), targetDefaults = MemoryStore()
+legacyDefaults.set(["Netflix", "MaxPlayer"], forKey: "quickActions")
+legacyDefaults.set(false, forKey: "showAppIcons")
+legacyDefaults.set("alexa", forKey: "voiceMode")
+legacyDefaults.set(true, forKey: "automationURLs")
+targetDefaults.set("apple", forKey: "voiceMode")           // already chosen in the new domain: kept
+var legacyRemoved = false
+let movedKeys = PreferencesMigration.migrate(from: legacyDefaults, to: targetDefaults,
+                                             keys: ["quickActions", "showAppIcons", "voiceMode"]) { legacyRemoved = true }
+check(movedKeys == ["quickActions", "showAppIcons"], "existing pre-release settings are copied")
+check(targetDefaults.object(forKey: "quickActions") as? [String] == ["Netflix", "MaxPlayer"]
+      && targetDefaults.object(forKey: "showAppIcons") as? Bool == false, "copied values are identical")
+check(targetDefaults.object(forKey: "voiceMode") as? String == "apple", "a value already set in the new domain is never overwritten")
+check(targetDefaults.object(forKey: "automationURLs") == nil, "the developer automation switch is never migrated")
+check(legacyRemoved && targetDefaults.bool(forKey: PreferencesMigration.markerKey), "the old domain is removed only after the copy")
+check(PreferencesMigration.migrate(from: legacyDefaults, to: targetDefaults, keys: ["quickActions"]) { legacyRemoved = false } == nil
+      && legacyRemoved, "the migration runs once")
+check(PreferencesMigration.migrate(from: MemoryStore(), to: MemoryStore(), keys: ["quickActions"]) {} == [],
+      "a new user has nothing to migrate")
+
 // MARK: Media buttons say what they send (the Fire TV interface has no previous/next)
 
 check(MediaCommand.allCases == [.playPause, .forward, .rewind], "only Play/Pause, Fast-forward and Rewind exist")

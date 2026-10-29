@@ -16,12 +16,6 @@ final class MirroringCoordinator {
         /// AirPlay receivers the Mac can see (excluding the Mac's own receiver).
         case guide([String])
         case notFound
-
-        /// A receiver was just found, so Mirror opens Displays settings instead of the receiver.
-        var isReady: Bool {
-            if case .guide = self { return true }
-            return false
-        }
     }
 
     /// Free, open-source receiver (F-Droid / GitHub jqssun/android-airplay-server, v0.0.36). Verified on this
@@ -90,7 +84,7 @@ final class MirroringCoordinator {
 
     @ObservationIgnored private var expiry: Task<Void, Never>?
 
-    @ObservationIgnored private let log = Logger(subsystem: "local.fireremote.app", category: "mirroring")
+    @ObservationIgnored private let log = Logger(subsystem: "local.zap.app", category: "mirroring")
 
     func close() { stage = .idle }
 
