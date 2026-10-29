@@ -249,6 +249,8 @@ if let plist = NSDictionary(contentsOfFile: "Resources/Info.plist") {
     check(plist["CFBundleName"] as? String == "to.zap" && plist["CFBundleDisplayName"] as? String == "to.zap"
           && plist["CFBundleExecutable"] as? String == "to.zap", "the product is named to.zap")
     check(PreferencesMigration.currentDomain == plist["CFBundleIdentifier"] as? String, "preferences migrate into the bundle identifier's domain")
+    check(plist["NSHumanReadableCopyright"] == nil,
+          "no copyright line in Finder's info panel; the license and notices ship as files in the bundle")
 } else {
     check(false, "Resources/Info.plist is readable")
 }

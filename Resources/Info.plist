@@ -43,7 +43,5 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-	<key>NSHumanReadableCopyright</key>
-	<string>© 2026 Cosmos Agency. MIT License.</string>
 </dict>
 </plist>

@@ -878,12 +878,19 @@ private struct AboutIdentity: View {
     }
 }
 
-/// The product signature: small and quiet.
+/// The product signature: small and quiet, "Open Source" as a plain descriptor rather than a badge.
 private struct AboutSignature: View {
     var body: some View {
-        Text("A product of Cosmos")
-            .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(DS.Palette.textSecondary)
+        VStack(spacing: 3) {
+            Text("A product of Cosmos")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(DS.Palette.textSecondary)
+            Text("Open Source")
+                .font(.system(size: 11))
+                .tracking(0.5)
+                .foregroundStyle(DS.Palette.textTertiary)
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -896,13 +903,6 @@ private struct AboutActions: View {
                            accessory: .symbol("arrow.up.right"),
                            hint: "Opens to.zap's source code on GitHub in your browser.") {
                 NSWorkspace.shared.open(ZAPProject.repository)
-            }
-            SettingsDivider().padding(.leading, 46)
-            AboutActionRow(symbol: "doc.text", title: "MIT License",
-                           accessory: .symbol("arrow.up.right"),
-                           hint: "Opens the license text included with the app.") {
-                // The copy inside the app bundle, so it opens offline; the repository's copy otherwise.
-                NSWorkspace.shared.open(Bundle.main.url(forResource: "LICENSE", withExtension: nil) ?? ZAPProject.license)
             }
             SettingsDivider().padding(.leading, 46)
             AboutActionRow(symbol: "arrow.triangle.2.circlepath", title: "Check for Updates",
