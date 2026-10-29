@@ -3,7 +3,7 @@ import Observation
 import ServiceManagement
 import ZAPKit
 
-/// Where ZAP keeps its preferences (the `local.tozap.app` domain). The offline preview works on a copy
+/// Where to.zap keeps its preferences (the `local.tozap.app` domain). The offline preview works on a copy
 /// (`local.tozap.app.preview`), refreshed from the real preferences at each preview launch, so trying things out
 /// changes nothing real.
 enum AppDefaults {
@@ -47,14 +47,14 @@ enum AppDefaults {
     }()
 }
 
-/// Settings → General / Advanced preferences, stored in ZAP's own defaults. Every switch here changes real
-/// behaviour; anything ZAP can't do is shown as unavailable instead of as a switch.
+/// Settings → General / Advanced preferences, stored in to.zap's own defaults. Every switch here changes real
+/// behaviour; anything to.zap can't do is shown as unavailable instead of as a switch.
 @MainActor
 @Observable
 final class AppPreferences {
     static let shared = AppPreferences()
 
-    /// The status item. Hidden only after confirmation; opening ZAP again (Finder, Spotlight) shows Settings.
+    /// The status item. Hidden only after confirmation; opening to.zap again (Finder, Spotlight) shows Settings.
     var showMenuBarIcon: Bool {
         didSet { AppDefaults.store.set(showMenuBarIcon, forKey: "showMenuBarIcon") }
     }
@@ -66,7 +66,7 @@ final class AppPreferences {
     var animationFeedback: Bool {
         didSet { AppDefaults.store.set(animationFeedback, forKey: "animationFeedback") }
     }
-    /// A read-only reachability check when the remote opens. ZAP never polls in the background.
+    /// A read-only reachability check when the remote opens. to.zap never polls in the background.
     var checkConnectionOnOpen: Bool {
         didSet { AppDefaults.store.set(checkConnectionOnOpen, forKey: "checkConnectionOnOpen") }
     }

@@ -74,7 +74,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
 #if ZAP_DEVTOOLS
             // Screenshots: `-ZAPSettingsSection about -ZAPCaptureSettings <file.png>` opens that section (in the
-            // preview or with the paired TV), captures ZAP's own window, then quits.
+            // preview or with the paired TV), captures to.zap's own window, then quits.
             if let path = UserDefaults.standard.string(forKey: "ZAPCaptureSettings") {
                 guard let section = UserDefaults.standard.string(forKey: "ZAPSettingsSection").flatMap(SettingsSection.init(rawValue:)) else {
                     print("-ZAPCaptureSettings needs -ZAPSettingsSection with one of: \(SettingsSection.allCases.map(\.rawValue))")
@@ -97,7 +97,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Opening ZAP again (Finder, Spotlight, Launchpad) while it runs shows Settings — the way back when the
+    /// Opening to.zap again (Finder, Spotlight, Launchpad) while it runs shows Settings — the way back when the
     /// menu bar icon is hidden.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         MainActor.assumeIsolated {

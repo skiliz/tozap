@@ -1,6 +1,6 @@
 ---
 name: Compatibility report
-about: Tell us how to.zap works with your Fire TV model
+about: Tell us whether to.zap works with your Fire TV model
 labels: compatibility
 ---
 

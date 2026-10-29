@@ -5,7 +5,7 @@ import ImageIO
 import Observation
 import ZAPKit
 
-/// The customisable shortcut row (`QuickAction`, ZAPKit), stored locally in ZAP's preferences.
+/// The customisable shortcut row (`QuickAction`, ZAPKit), stored locally in to.zap's preferences.
 @MainActor
 @Observable
 final class QuickActionsStore {
@@ -117,7 +117,7 @@ func shortAppName(_ name: String) -> String {
 }
 
 /// App icons exactly as the TV's app list provides them (Amazon's image servers), downloaded once and
-/// cached in ~/Library/Application Support/ZAP/icons. Optional: Settings → Advanced.
+/// cached in ~/Library/Application Support/to.zap/icons-v2. Optional: Settings → Advanced.
 @MainActor
 @Observable
 final class AppIconStore {

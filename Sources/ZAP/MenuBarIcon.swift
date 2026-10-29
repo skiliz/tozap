@@ -155,7 +155,7 @@ enum MenuBarStatusText {
         try? rep.representation(using: .png, properties: [:])?.write(to: url)
     }
 
-    /// For the developer demo log: is the button showing ZAP's colour image, and in which appearance?
+    /// For the developer demo log: is the button showing to.zap's colour image, and in which appearance?
     static func debugSummary(expected: NSImage) -> String {
         guard let button = button ?? find() else { return "status item button not found" }
         let image = button.image

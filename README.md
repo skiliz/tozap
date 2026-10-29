@@ -222,7 +222,7 @@ to.zap's data as well.
 ## Building and contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Reports from other Fire TV models are especially welcome.
-[docs/PROTOCOL.md](docs/PROTOCOL.md) explains how to.zap talks to the TV, and
+[docs/PROTOCOL.md](docs/PROTOCOL.md) explains the Fire TV interface to.zap uses, and
 [docs/RELEASING.md](docs/RELEASING.md) how releases are built.
 
 ## License

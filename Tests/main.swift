@@ -6,6 +6,10 @@ if CommandLine.arguments.contains("--migration-probe") {
     PairingStore.migrateLegacyStoreIfNeeded()
     exit(PairingStore.load()?.nickname == "Office" ? 0 : 1)
 }
+if CommandLine.arguments.contains("--forget-probe") {
+    PairingStore.forget()
+    exit(PairingStore.load() == nil ? 0 : 1)
+}
 
 // Dependency-free test runner (the Command Line Tools ship no XCTest). Run: scripts/build.sh test
 // It never touches the network or the real pairing store.
@@ -467,6 +471,52 @@ check(FileManager.default.fileExists(atPath: newFolder.appendingPathComponent("i
       "the icon cache moves with it")
 check(!FileManager.default.fileExists(atPath: remoteFolder.path), "the emptied ZAP Remote folder is removed")
 try? FileManager.default.removeItem(at: remoteRoot)
+
+/// Runs the test binary as a child process with its own Application Support folder.
+func probe(_ argument: String, root: URL) -> Int32 {
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: CommandLine.arguments[0])
+    process.arguments = [argument]
+    process.environment = ["ZAP_SUPPORT_DIR": root.path]
+    try! process.run()
+    process.waitUntilExit()
+    return process.terminationStatus
+}
+func plant(_ files: [String: String], in root: URL) {
+    for (path, text) in files {
+        let url = root.appendingPathComponent(path)
+        try! FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try! Data(text.utf8).write(to: url)
+    }
+}
+let exists = { (url: URL) in FileManager.default.fileExists(atPath: url.path) }
+
+// Both pre-release folders hold a token: the newest moves, the older copy is removed, the scanner's files stay.
+let twoRoot = FileManager.default.temporaryDirectory.appendingPathComponent("zap-move-\(UUID().uuidString)")
+plant(["ZAP Remote/device.json": pairedJSON, "ZAP/device.json": pairedJSON, "ZAP/config.xml": "scanner"], in: twoRoot)
+check(probe("--migration-probe", root: twoRoot) == 0, "the newest pre-release pairing moves to to.zap")
+check(!exists(twoRoot.appendingPathComponent("ZAP/device.json")) && exists(twoRoot.appendingPathComponent("ZAP/config.xml")),
+      "an older token copy in the scanner's folder is removed, its own files stay")
+try? FileManager.default.removeItem(at: twoRoot)
+
+// A pairing that doesn't read back: nothing old is removed and no marker is written, so the next launch retries.
+let badRoot = FileManager.default.temporaryDirectory.appendingPathComponent("zap-move-\(UUID().uuidString)")
+plant(["ZAP Remote/device.json": "{not json"], in: badRoot)
+check(probe("--migration-probe", root: badRoot) != 0, "an unreadable pairing isn't treated as migrated")
+check(exists(badRoot.appendingPathComponent("ZAP Remote/device.json"))
+      && !exists(badRoot.appendingPathComponent("to.zap/.legacy-store-checked")),
+      "the old copy stays and the migration will run again")
+try? FileManager.default.removeItem(at: badRoot)
+
+// Forget removes every copy of the token: the current folder and all older ones.
+let forgetRoot = FileManager.default.temporaryDirectory.appendingPathComponent("zap-move-\(UUID().uuidString)")
+plant(["to.zap/device.json": pairedJSON, "ZAP Remote/device.json": pairedJSON, "ZAP/device.json": pairedJSON,
+       "Fire Remote/device.json": pairedJSON, "ZAP/config.xml": "scanner"], in: forgetRoot)
+check(probe("--forget-probe", root: forgetRoot) == 0, "Forget leaves no readable pairing")
+check(["to.zap", "ZAP Remote", "ZAP", "Fire Remote"].allSatisfy { !exists(forgetRoot.appendingPathComponent("\($0)/device.json")) }
+      && exists(forgetRoot.appendingPathComponent("ZAP/config.xml")),
+      "Forget removes the token from every folder and nothing else")
+try? FileManager.default.removeItem(at: forgetRoot)
 
 print("\(passed) passed, \(failures) failed")
 try? FileManager.default.removeItem(at: temp)  // `exit` skips the top-level defer

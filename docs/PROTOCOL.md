@@ -1,4 +1,4 @@
-# How to.zap talks to a Fire TV
+# The Fire TV interface to.zap uses
 
 Interoperability notes for contributors. This describes the local network interface used by the Fire TV
 mobile app, as documented by open-source projects (see [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md))

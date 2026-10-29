@@ -5,7 +5,7 @@ import ScreenCaptureKit
 import SwiftUI
 import os
 
-/// Developer tool for the README screenshots: captures ZAP's own panel window. Since macOS 14.4 a process
+/// Developer tool for the README screenshots: captures to.zap's own panel window. Since macOS 14.4 a process
 /// may capture its own windows without Screen Recording permission (`SCShareableContent.currentProcess`).
 /// Reachable only through the hidden automation URLs.
 @MainActor

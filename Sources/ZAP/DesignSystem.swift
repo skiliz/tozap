@@ -2,7 +2,7 @@ import AppKit
 import Observation
 import SwiftUI
 
-/// ZAP's design tokens: neutral graphite, no decorative colour. The only colours are functional:
+/// to.zap's design tokens: neutral graphite, no decorative colour. The only colours are functional:
 /// a small green "connected" dot, red while the microphone records, and warning/error.
 enum DS {
     enum Palette {
@@ -99,7 +99,7 @@ enum DS {
     }
 }
 
-/// The system's accessibility display options, kept current while ZAP runs.
+/// The system's accessibility display options, kept current while to.zap runs.
 @MainActor
 @Observable
 final class AccessibilityPrefs {
@@ -108,7 +108,7 @@ final class AccessibilityPrefs {
     private(set) var reduceTransparency = false
     private(set) var increaseContrast = false
 
-    /// System Reduce Motion, or ZAP's own "Animation feedback" turned off: movement becomes a fade.
+    /// System Reduce Motion, or to.zap's own "Animation feedback" turned off: movement becomes a fade.
     var motionReduced: Bool { reduceMotion || !AppPreferences.shared.animationFeedback }
 
     private init() {

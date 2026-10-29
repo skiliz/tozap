@@ -44,7 +44,7 @@ struct GeneralSettingsPage: View {
     var body: some View {
         let prefs = AppPreferences.shared
         let _ = navigation.refreshTick  // re-read the login item when the window becomes key
-        SettingsPage(title: "General", subtitle: "Startup, the menu bar, and how to.zap looks and moves.") {
+        SettingsPage(title: "General", subtitle: "Startup, the menu bar, and the look and motion of to.zap.") {
             SettingsToggleRow(title: "Launch at login",
                               subtitle: "Open to.zap automatically when you log in to this Mac.",
                               note: loginNote(prefs), noteIsWarning: prefs.loginItemError != nil,
@@ -475,7 +475,7 @@ private struct AppShortcutRow: View {
     }
 }
 
-/// Chooses an app from the TV's own list (the copy ZAP saved, or a fresh read when asked).
+/// Chooses an app from the TV's own list (the copy to.zap saved, or a fresh read when asked).
 private struct AppChooserSheet: View {
     let model: RemoteModel
     let navigation: SettingsNavigation
@@ -568,7 +568,7 @@ struct VoiceSettingsPage: View {
     var body: some View {
         let voice = model.voice
         let _ = navigation.refreshTick  // permissions are re-read when the window becomes key
-        SettingsPage(title: "Voice", subtitle: "How to.zap understands what you say. The microphone is on only while you hold push-to-talk.") {
+        SettingsPage(title: "Voice", subtitle: "Voice commands for your TV. The microphone is on only while you hold push-to-talk.") {
             VStack(alignment: .leading, spacing: 6) {
                 VoiceModeOption(voice: voice, mode: .local, title: "Apple Speech on this Mac (Italian)",
                                 subtitle: localSubtitle(voice))
@@ -1045,7 +1045,7 @@ enum UpdateMessage {
     static func message(_ result: UpdateCheckResult) -> String {
         switch result {
         case .upToDate(let installed):
-            return "No newer version is available. You have to.zap \(installed)."
+            return "No newer version is available. You have version \(installed)."
         case .updateAvailable(let installed, _, _):
             if installation == .homebrew {
                 return "You have version \(installed). to.zap was installed with Homebrew, so update it in Terminal:\n\n\(ZAPProject.homebrewUpgradeCommand)"

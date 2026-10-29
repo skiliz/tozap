@@ -7,7 +7,7 @@ Please report security issues privately through GitHub's
 repository rather than in a public issue. We aim to acknowledge reports within a week. There is no bug
 bounty.
 
-## How to.zap protects the connection to your TV
+## How the connection to your TV is protected
 
 - **Pairing is authorised on the TV.** to.zap gets access only after you type the PIN the Fire TV displays.
 - **TLS is always verified.** The Fire TV's remote service presents a certificate chain issued by an

@@ -11,7 +11,7 @@ import os
 final class RemoteModel {
     static let shared = RemoteModel()
 
-    /// Looking at the UI without touching anything: `open -n "build/to.zap Remote.app" --args -ZAPOfflinePreview YES`.
+    /// Looking at the UI without touching anything: `open -n "build/to.zap.app" --args -ZAPOfflinePreview YES`.
     /// No client is created; nothing is discovered, sent or downloaded; the microphone and the login item
     /// are left alone, and the pairing is read but never changed. (A launch argument, not a stored setting.)
     static let offlinePreview = AppDefaults.isOfflinePreview
@@ -241,7 +241,7 @@ final class RemoteModel {
     }
 
     func start() {
-        // ZAP's windows are dark on their own (Settings window, remote panel), so the menu bar icon still
+        // to.zap's windows are dark on their own (Settings window, remote panel), so the menu bar icon still
         // follows the real menu bar appearance.
         // Hidden developer switch: `defaults write local.tozap.app automationURLs -bool true`
 #if ZAP_DEVTOOLS
@@ -276,7 +276,7 @@ final class RemoteModel {
     }
 
 #if ZAP_DEVTOOLS
-    /// See `menuBarDemo`. Logs each state and, with `-ZAPMenuBarDemoCapture <folder>`, saves a picture of ZAP's
+    /// See `menuBarDemo`. Logs each state and, with `-ZAPMenuBarDemoCapture <folder>`, saves a picture of to.zap's
     /// own status item for each one (no permission needed for an app's own windows).
     private func runMenuBarDemo() {
         let captureFolder = UserDefaults.standard.string(forKey: "ZAPMenuBarDemoCapture").map { URL(fileURLWithPath: $0) }
@@ -367,7 +367,7 @@ final class RemoteModel {
         updateReconnectAnimation()
     }
 
-    /// Green in the menu bar only while this confirmation is recent; ZAP never polls to keep it green.
+    /// Green in the menu bar only while this confirmation is recent; to.zap never polls to keep it green.
     private func markVerified() {
         verifiedAt = Date()
         freshnessTask?.cancel()
@@ -686,7 +686,7 @@ final class RemoteModel {
     /// Receiver launches are part of the mirroring flow, which reports its own outcome.
     @ObservationIgnored private var silentLaunches: Set<String> = []
 
-    /// Opens AirPlay Server on the TV (the receiver verified with ZAP) unless a receiver on the TV is already
+    /// Opens AirPlay Server on the TV (the receiver verified with to.zap) unless a receiver on the TV is already
     /// visible, then reports what the Mac can see. Other receiver apps are used only when already running.
     /// While a receiver was just found, the Mirror button opens Displays settings instead.
     func startMirroring() {
@@ -876,7 +876,7 @@ final class RemoteModel {
         }
     }
 
-    /// App-local key monitor: only sees keys typed into ZAP's own panel and needs no permission.
+    /// App-local key monitor: only sees keys typed into to.zap's own panel and needs no permission.
     private func installKeyMonitor() {
         NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp]) { event in
             MainActor.assumeIsolated { RemoteModel.shared.handleKeyEvent(event) } ? nil : event

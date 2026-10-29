@@ -25,12 +25,12 @@ final class MirroringCoordinator {
 
     private(set) var stage: Stage = .idle
 
-    /// The connected display that belongs to an AirPlay receiver ZAP has seen: macOS is mirroring or extending
+    /// The connected display that belongs to an AirPlay receiver to.zap has seen: macOS is mirroring or extending
     /// to the TV right now. Read from the system's display list when it changes — nothing is polled. (In
     /// mirror mode macOS may not list the AirPlay display separately; then this stays nil, never a guess.)
     private(set) var mirroredDisplay: String?
 
-    /// Names of AirPlay receivers found by ZAP (e.g. "Android AirPlay"), remembered between launches.
+    /// Names of AirPlay receivers found by to.zap (e.g. "Android AirPlay"), remembered between launches.
     @ObservationIgnored private var receiverNames: Set<String> =
         Set(AppDefaults.store.stringArray(forKey: "airPlayReceiverNames") ?? [])
     @ObservationIgnored private var displayObserver: NSObjectProtocol?

@@ -1,6 +1,6 @@
 import Foundation
 
-/// The TV connection as ZAP last established it. ZAP never polls: it checks when the remote opens (Settings →
+/// The TV connection as to.zap last established it. to.zap never polls: it checks when the remote opens (Settings →
 /// Advanced) and after a failure, and every command the TV accepts confirms the connection again.
 public enum ConnectionState: Equatable, Sendable {
     case pairingRequired, checking, connected, searching, reconnecting, unavailable
@@ -46,7 +46,7 @@ public struct MenuBarStatus: Equatable, Sendable {
     /// For the tooltip and VoiceOver, e.g. "Living Room: Connected (checked at 21:04)".
     public let description: String
 
-    /// ZAP doesn't poll, so after this long a confirmation no longer proves the TV is still there.
+    /// to.zap doesn't poll, so after this long a confirmation no longer proves the TV is still there.
     public static let freshness: TimeInterval = 10 * 60
 
     public static func resolve(deviceName: String?, connection: ConnectionState, verifiedAt: Date?, now: Date = Date(),
@@ -92,7 +92,8 @@ public struct MenuBarStatus: Equatable, Sendable {
                 state = "Offline preview — nothing is sent to the TV"
             }
         }
-        var parts = ["\(deviceName ?? "to.zap"): \(state)"]
+        // The menu bar item is already labelled "to.zap", so without a TV name the state stands alone.
+        var parts = [deviceName.map { "\($0): \(state)" } ?? state]
         if listening { parts.append("Microphone on") }
         if let mirroringDisplay { parts.append("Screen shared to \(mirroringDisplay)") }
         return MenuBarStatus(link: link, listening: listening, mirroringDisplay: mirroringDisplay,
@@ -109,7 +110,7 @@ public enum AirPlayReceiverChoice {
     }
 }
 
-/// Matching a connected display to an AirPlay receiver ZAP has seen: macOS names an AirPlay display after the
+/// Matching a connected display to an AirPlay receiver to.zap has seen: macOS names an AirPlay display after the
 /// receiver it streams to.
 public enum AirPlayDisplay {
     public static func matches(screenName: String, receiver: String) -> Bool {

@@ -171,7 +171,7 @@ public enum UpdateChecker {
         return .updateAvailable(installed: installed, latest: latest, releasePage: releasePage(release.htmlURL))
     }
 
-    /// The release's own page when it is one of ZAP's GitHub releases; otherwise ZAP's release list.
+    /// The release's own page when it is one of to.zap's GitHub releases; otherwise to.zap's release list.
     public static func releasePage(_ text: String?) -> URL {
         guard let text, let url = URL(string: text), url.scheme == "https", url.host == "github.com",
               url.user == nil, url.port == nil,
@@ -200,7 +200,7 @@ private final class GitHubAPIRedirectsOnly: NSObject, URLSessionTaskDelegate {
     }
 }
 
-/// How this copy of ZAP was installed, only when that can be verified on disk.
+/// How this copy of to.zap was installed, only when that can be verified on disk.
 public enum InstallationSource: Equatable, Sendable {
     /// Homebrew's Caskroom holds the tozap-remote cask and the running app sits in an Applications folder.
     case homebrew
