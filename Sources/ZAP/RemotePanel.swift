@@ -613,7 +613,9 @@ private struct RingWedge: Shape {
         let center = CGPoint(x: rect.midX, y: rect.midY)
         let outer = min(rect.width, rect.height) / 2
         func point(_ radius: CGFloat, _ angle: Double) -> CGPoint {
-            CGPoint(x: center.x + radius * cos(angle), y: center.y + radius * sin(angle))
+            // Explicit Double results keep cos/sin unambiguous on older Swift toolchains (CI).
+            let cosine: Double = cos(angle), sine: Double = sin(angle)
+            return CGPoint(x: center.x + radius * CGFloat(cosine), y: center.y + radius * CGFloat(sine))
         }
         let start = direction.radians - .pi / 4
         let steps = 16
@@ -660,13 +662,14 @@ private struct ArrowKey: View {
         let pressed = model.pressedKeys.contains(key)
         let wedge = RingWedge(direction: direction, inner: DS.Size.ok / 2 + 2)
         let distance = DS.Size.dpad * 0.335
+        let cosine: Double = cos(direction.radians), sine: Double = sin(direction.radians)
         Button { model.keyActivated(key) } label: {
             ZStack {
                 wedge.fill(Color.white.opacity(pressed ? 0.07 : 0))
                 Image(systemName: key.symbol)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(pressed ? DS.Palette.textPrimary : DS.Palette.textSecondary)
-                    .offset(x: distance * cos(direction.radians), y: distance * sin(direction.radians))
+                    .offset(x: distance * CGFloat(cosine), y: distance * CGFloat(sine))
             }
             .frame(width: DS.Size.dpad, height: DS.Size.dpad)
             .contentShape(wedge)
